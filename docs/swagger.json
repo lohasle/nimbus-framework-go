@@ -1,0 +1,344 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Go modular-monolith scaffold for operations platforms. Default database: MySQL 8.4.",
+        "title": "Nimbus Framework Go API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/admin-api",
+    "paths": {
+        "/app/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/application/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/im/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/infra/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/member/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/pay/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/auth/get-permission-info": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns current admin profile, roles, permissions and menu tree.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Auth"
+                ],
+                "summary": "Current user and menus",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/auth/login": {
+            "post": {
+                "description": "Authenticates an operations-console user in a tenant.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Auth"
+                ],
+                "summary": "Admin login",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Tenant ID",
+                        "name": "tenant-id",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Credentials",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/internal_system.LoginRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/auth/logout": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Ends the client session. JWT tokens expire naturally in this scaffold.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Auth"
+                ],
+                "summary": "Admin logout",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/health": {
+            "get": {
+                "description": "Health endpoint used by deployment probes and scaffold modules.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Service health",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/tenant/get-id-by-name": {
+            "get": {
+                "description": "Returns an enabled tenant ID by tenant name.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "System Auth"
+                ],
+                "summary": "Resolve tenant ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Tenant name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "github_com_lohasle_nimbus-framework-go_internal_httpx.Response": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "data": {},
+                "msg": {
+                    "type": "string",
+                    "example": ""
+                }
+            }
+        },
+        "internal_system.LoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string",
+                    "example": "admin123"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}

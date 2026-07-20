@@ -1,0 +1,126 @@
+@use './var.css';
+@use './FormCreate/index.scss';
+@use './theme.scss';
+@use 'element-plus/theme-chalk/dark/css-vars.css';
+
+.reset-margin [class*='el-icon'] + span {
+  margin-left: 2px !important;
+}
+
+// 解决抽屉弹出时，body宽度变化的问题
+.el-popup-parent--hidden {
+  width: 100% !important;
+}
+
+// 解决表格内容超过表格总宽度后，横向滚动条前端顶不到表格边缘的问题
+.el-scrollbar__bar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* nprogress 适配 element-plus 的主题色 */
+#nprogress {
+  & .bar {
+    background-color: var(--el-color-primary) !important;
+  }
+
+  & .peg {
+    box-shadow:
+      0 0 10px var(--el-color-primary),
+      0 0 5px var(--el-color-primary) !important;
+  }
+
+  & .spinner-icon {
+    border-top-color: var(--el-color-primary);
+    border-left-color: var(--el-color-primary);
+  }
+}
+
+/* Nimbus 基础视觉层：只统一框架与 Element Plus 外观，不改业务表格结构。 */
+:root {
+  --el-color-primary: var(--primary);
+  --el-bg-color: var(--bg-surface);
+  --el-bg-color-page: var(--bg-canvas);
+  --el-bg-color-overlay: var(--bg-elevated);
+  --el-text-color-primary: var(--text-primary);
+  --el-text-color-regular: var(--text-secondary);
+  --el-text-color-secondary: var(--text-tertiary);
+  --el-text-color-placeholder: var(--text-disabled);
+  --el-border-color: var(--border-default);
+  --el-border-color-light: var(--divider);
+  --el-border-color-lighter: var(--divider);
+  --el-fill-color-light: var(--bg-subtle);
+  --el-fill-color-lighter: var(--bg-hover);
+  --el-fill-color-blank: var(--bg-surface);
+  --el-border-radius-base: var(--radius-md);
+  --el-border-radius-small: var(--radius-sm);
+}
+
+.layout-border__right {
+  border-right-color: var(--border-default) !important;
+}
+
+.layout-border__top {
+  border-top-color: var(--border-default) !important;
+}
+
+.layout-border__bottom {
+  border-bottom-color: var(--border-default) !important;
+}
+
+.custom-hover {
+  border-radius: var(--radius-md);
+}
+
+.custom-hover:hover {
+  background-color: var(--bg-hover) !important;
+}
+
+.el-card {
+  border-color: var(--border-default);
+  border-radius: var(--radius-lg);
+}
+
+.el-table {
+  --el-table-border-color: var(--divider);
+  --el-table-header-bg-color: var(--bg-subtle);
+  --el-table-row-hover-bg-color: var(--bg-hover);
+  --el-table-current-row-bg-color: var(--bg-selected);
+
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.el-table th.el-table__cell {
+  height: 44px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.el-table td.el-table__cell {
+  height: 48px;
+}
+
+.el-button,
+.el-input__wrapper,
+.el-select__wrapper {
+  min-height: 36px;
+}
+
+.el-dialog,
+.el-drawer {
+  background: var(--bg-elevated);
+}
+
+.el-dialog {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-dialog);
+}
+
+.el-drawer {
+  box-shadow: var(--shadow-drawer);
+}
+
+.el-overlay {
+  background-color: var(--bg-mask);
+}

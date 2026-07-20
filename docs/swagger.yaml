@@ -1,0 +1,225 @@
+basePath: /admin-api
+definitions:
+  github_com_lohasle_nimbus-framework-go_internal_httpx.Response:
+    properties:
+      code:
+        example: 0
+        type: integer
+      data: {}
+      msg:
+        example: ""
+        type: string
+    type: object
+  internal_system.LoginRequest:
+    properties:
+      password:
+        example: admin123
+        type: string
+      username:
+        example: admin
+        type: string
+    required:
+    - password
+    - username
+    type: object
+info:
+  contact: {}
+  description: 'Go modular-monolith scaffold for operations platforms. Default database:
+    MySQL 8.4.'
+  title: Nimbus Framework Go API
+  version: "1.0"
+paths:
+  /app/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /application/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /im/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /infra/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /member/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /pay/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /system/auth/get-permission-info:
+    get:
+      description: Returns current admin profile, roles, permissions and menu tree.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Current user and menus
+      tags:
+      - System Auth
+  /system/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates an operations-console user in a tenant.
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        required: true
+        type: integer
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_system.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Admin login
+      tags:
+      - System Auth
+  /system/auth/logout:
+    post:
+      description: Ends the client session. JWT tokens expire naturally in this scaffold.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Admin logout
+      tags:
+      - System Auth
+  /system/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /system/tenant/get-id-by-name:
+    get:
+      description: Returns an enabled tenant ID by tenant name.
+      parameters:
+      - description: Tenant name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_httpx.Response'
+      summary: Resolve tenant ID
+      tags:
+      - System Auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

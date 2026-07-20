@@ -1,0 +1,174 @@
+:root {
+  color-scheme: light;
+
+  --font-sans: Inter, 'PingFang SC', 'Noto Sans CJK SC', 'Microsoft YaHei', Arial, sans-serif;
+  --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-pill: 999px;
+  --shadow-popover: 0 8px 24px rgb(16 24 40 / 12%);
+  --shadow-dialog: 0 20px 48px rgb(16 24 40 / 18%);
+  --shadow-drawer: -8px 0 32px rgb(16 24 40 / 12%);
+  --bg-canvas: #f7f9fc;
+  --bg-surface: #fff;
+  --bg-subtle: #f2f5fa;
+  --bg-elevated: #fff;
+  --bg-sidebar: #fafbfd;
+  --bg-hover: #f4f7fc;
+  --bg-selected: #edf3ff;
+  --bg-mask: rgb(16 24 40 / 38%);
+  --text-primary: #101828;
+  --text-secondary: #475467;
+  --text-tertiary: #667085;
+  --text-disabled: #98a2b3;
+  --text-inverse: #fff;
+  --border-default: #e4e7ec;
+  --border-strong: #d0d5dd;
+  --divider: #eaecf0;
+  --primary: #3c63f3;
+  --primary-hover: #3155d8;
+  --primary-active: #2948ba;
+  --primary-soft: #edf2ff;
+  --focus-ring: rgb(60 99 243 / 24%);
+  --success: #079455;
+  --success-soft: #ecfdf3;
+  --warning: #dc6803;
+  --warning-soft: #fff6ed;
+  --danger: #d92d20;
+  --danger-soft: #fef3f2;
+  --info: #175cd3;
+  --info-soft: #eff8ff;
+  --login-bg-color: var(--bg-canvas);
+  --left-menu-max-width: 216px;
+  --left-menu-min-width: 64px;
+  --left-menu-bg-color: var(--bg-sidebar);
+  --left-menu-bg-light-color: var(--bg-subtle);
+  --left-menu-bg-active-color: var(--bg-selected);
+  --left-menu-text-color: var(--text-secondary);
+  --left-menu-text-active-color: var(--primary);
+  --left-menu-collapse-bg-active-color: var(--bg-selected);
+  --logo-height: 56px;
+  --logo-title-text-color: var(--text-primary);
+  --top-header-bg-color: var(--bg-surface);
+  --top-header-text-color: var(--text-secondary);
+  --top-header-hover-color: var(--bg-hover);
+  --top-tool-height: var(--logo-height);
+  --top-tool-p-x: 8px;
+  --tags-view-height: 40px;
+  --tab-menu-max-width: 80px;
+  --tab-menu-min-width: 30px;
+  --tab-menu-collapse-height: 36px;
+  --app-content-padding: 24px;
+  --app-content-bg-color: var(--bg-canvas);
+  --app-footer-height: 50px;
+  --transition-time-02: 0.2s;
+  --z-sticky: 100;
+  --z-dropdown: 1000;
+  --z-popover: 1100;
+  --z-drawer: 1200;
+  --z-dialog: 1300;
+  --z-toast: 1400;
+  --z-tooltip: 1500;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg-canvas: #0b1220;
+  --bg-surface: #111a2a;
+  --bg-subtle: #162133;
+  --bg-elevated: #19263a;
+  --bg-sidebar: #0d1726;
+  --bg-hover: #17243a;
+  --bg-selected: #1a2d55;
+  --bg-mask: rgb(0 0 0 / 58%);
+  --text-primary: #f2f4f7;
+  --text-secondary: #c4cad4;
+  --text-tertiary: #98a2b3;
+  --text-disabled: #667085;
+  --text-inverse: #101828;
+  --border-default: #27364a;
+  --border-strong: #34465f;
+  --divider: #223147;
+  --primary: #7892ff;
+  --primary-hover: #8da3ff;
+  --primary-active: #a0b2ff;
+  --primary-soft: #1b2d59;
+  --focus-ring: rgb(120 146 255 / 32%);
+  --success: #47cd89;
+  --success-soft: #123727;
+  --warning: #fdb022;
+  --warning-soft: #3a2a12;
+  --danger: #ff7770;
+  --danger-soft: #3d1c21;
+  --info: #84adff;
+  --info-soft: #172f52;
+  --app-content-bg-color: var(--bg-canvas);
+}
+
+html,
+body,
+button,
+input,
+select,
+textarea {
+  font-family: var(--font-sans);
+}
+
+html,
+body {
+  color: var(--text-primary);
+  background: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+*,
+::after,
+::before {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+button,
+a {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+@media (width >= 1600px) {
+  :root {
+    --app-content-padding: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::after,
+  ::before {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,26 @@
+name: nimbus-framework-go
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: nimbus-go-mysql
+    environment:
+      MYSQL_DATABASE: nimbus_platform_go
+      MYSQL_USER: nimbus
+      MYSQL_PASSWORD: nimbus_dev
+      MYSQL_ROOT_PASSWORD: nimbus_root_dev
+      TZ: Asia/Shanghai
+    ports:
+      - "23316:3306"
+    volumes:
+      - nimbus-go-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u nimbus -pnimbus_dev --silent"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+volumes:
+  nimbus-go-mysql-data:
+
