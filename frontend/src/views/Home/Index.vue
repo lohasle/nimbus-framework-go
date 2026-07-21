@@ -7,8 +7,9 @@
         <p>从这里进入系统、基础设施、会员与支付等平台能力。</p>
       </div>
       <div class="page-heading__actions">
-        <el-button @click="go('/infra/api-doc')">接口文档</el-button>
-        <el-button type="primary" @click="go('/system/user')">管理平台用户</el-button>
+        <el-button tag="a" :href="apiDocsUrl" target="_blank" rel="noreferrer">
+          接口文档
+        </el-button>
       </div>
     </header>
 
@@ -35,14 +36,7 @@
       </header>
 
       <div class="domain-grid">
-        <button
-          v-for="domain in domains"
-          :key="domain.name"
-          class="domain-card"
-          type="button"
-          :aria-label="domain.path ? `进入${domain.name}` : `${domain.name}扩展模板`"
-          @click="domain.path && go(domain.path)"
-        >
+        <article v-for="domain in domains" :key="domain.name" class="domain-card">
           <span class="domain-card__icon" aria-hidden="true">
             <Icon :icon="domain.icon" :size="20" />
           </span>
@@ -51,10 +45,9 @@
             <small>{{ domain.description }}</small>
           </span>
           <span class="domain-card__state" :class="{ template: domain.template }">
-            {{ domain.template ? '扩展模板' : '已接入' }}
+            {{ domain.template ? '扩展模板' : 'Health 已接入' }}
           </span>
-          <Icon v-if="domain.path" icon="lucide:chevron-right" :size="16" aria-hidden="true" />
-        </button>
+        </article>
       </div>
     </section>
 
@@ -97,13 +90,12 @@ import { useUserStore } from '@/store/modules/user'
 
 defineOptions({ name: 'Index' })
 
-const router = useRouter()
 const userStore = useUserStore()
 const username = computed(() => userStore.getUser.nickname || '平台管理员')
 const hour = new Date().getHours()
 const greeting = computed(() => (hour < 12 ? '早上好' : hour < 18 ? '下午好' : '晚上好'))
 
-const go = (path: string) => router.push(path)
+const apiDocsUrl = `${import.meta.env.VITE_BASE_URL}/swagger/index.html`
 
 const metrics = [
   {
@@ -135,27 +127,23 @@ const metrics = [
 const domains = [
   {
     name: '系统中心',
-    description: '组织、账号、权限、租户与审计',
-    icon: 'lucide:shield-check',
-    path: '/system/user'
+    description: '租户、运营账号、认证与权限入口',
+    icon: 'lucide:shield-check'
   },
   {
     name: '基础设施',
-    description: '配置、日志、任务、文件与监控',
-    icon: 'lucide:server-cog',
-    path: '/infra/config'
+    description: '配置、日志、任务、文件与监控边界',
+    icon: 'lucide:server-cog'
   },
   {
     name: '会员中心',
-    description: '会员、等级、积分与用户画像',
-    icon: 'lucide:users-round',
-    path: '/member/user'
+    description: '会员、等级、积分与用户画像边界',
+    icon: 'lucide:users-round'
   },
   {
     name: '支付中心',
-    description: '应用、渠道、订单、退款与钱包',
-    icon: 'lucide:wallet-cards',
-    path: '/pay/app'
+    description: '应用、渠道、订单、退款与钱包边界',
+    icon: 'lucide:wallet-cards'
   },
   {
     name: '应用中心',
@@ -342,22 +330,14 @@ const principles = [
   padding: var(--space-4);
   color: var(--text-primary);
   text-align: left;
-  cursor: pointer;
+  cursor: default;
   background: var(--bg-surface);
   border: 0;
   border-right: 1px solid var(--divider);
   border-bottom: 1px solid var(--divider);
-  grid-template-columns: 36px minmax(0, 1fr) auto 16px;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   gap: var(--space-3);
   align-items: center;
-  transition:
-    color 160ms ease,
-    background-color 160ms ease;
-
-  &:hover {
-    color: var(--primary);
-    background: var(--bg-hover);
-  }
 
   &__icon {
     display: grid;

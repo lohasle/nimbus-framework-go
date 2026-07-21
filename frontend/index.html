@@ -13,17 +13,29 @@
   <body>
     <div id="app">
       <style>
+        html,
+        body,
+        #app {
+          width: 100%;
+          min-height: 100%;
+          margin: 0;
+        }
+
         .app-loading {
           display: grid;
           width: 100%;
-          min-height: 100%;
+          min-height: 100vh;
+          padding-bottom: 5vh;
+          box-sizing: border-box;
           place-items: center;
-          color: #0f172a;
+          color: #1f2a44;
           background:
-            radial-gradient(circle at 16% 12%, rgb(59 130 246 / 12%), transparent 31%),
-            radial-gradient(circle at 86% 84%, rgb(79 70 229 / 10%), transparent 34%), #f4f7fb;
+            radial-gradient(circle at 3% 50%, rgb(22 93 255 / 5%), transparent 34%),
+            radial-gradient(circle at 98% 50%, rgb(109 74 255 / 5%), transparent 34%), #fbfcff;
           font-family:
             Inter,
+            'PingFang SC',
+            'Microsoft YaHei',
             ui-sans-serif,
             system-ui,
             -apple-system,
@@ -32,131 +44,119 @@
             sans-serif;
         }
 
-        .app-loading-card {
-          width: min(360px, calc(100vw - 40px));
-          padding: 34px;
-          background: rgb(255 255 255 / 86%);
-          border: 1px solid rgb(255 255 255 / 92%);
-          border-radius: 14px;
-          backdrop-filter: blur(18px);
+        .app-loading-content {
+          width: min(520px, calc(100vw - 48px));
+          text-align: center;
         }
 
         .app-loading-brand {
           display: flex;
-          gap: 14px;
+          gap: 24px;
           align-items: center;
+          justify-content: center;
         }
 
         .app-loading-logo {
-          width: 54px;
-          height: 54px;
+          width: 80px;
+          height: 80px;
           flex: none;
-          filter: drop-shadow(0 8px 16px rgb(37 99 235 / 20%));
-        }
-
-        .app-loading-eyebrow {
-          display: block;
-          margin-bottom: 5px;
-          font-size: 10px;
-          font-weight: 750;
-          letter-spacing: 0.18em;
-          color: #2563eb;
+          filter: drop-shadow(0 10px 22px rgb(37 99 235 / 16%));
         }
 
         .app-loading-title {
           margin: 0;
-          font-size: 18px;
-          font-weight: 720;
-          letter-spacing: -0.02em;
+          font-size: clamp(28px, 2.3vw, 36px);
+          font-weight: 700;
+          line-height: 1.2;
+          letter-spacing: -0.025em;
+          color: #0b1739;
         }
 
-        .app-loading-status {
-          display: flex;
-          justify-content: space-between;
-          margin: 30px 0 10px;
-          font-size: 12px;
-          color: #64748b;
+        .app-loading-heading {
+          margin: 42px 0 0;
+          font-size: 22px;
+          font-weight: 600;
+          line-height: 30px;
+          color: #1f2a44;
         }
 
-        .app-loading-status strong {
-          font-weight: 650;
-          color: #334155;
+        .app-loading-description {
+          margin: 14px 0 0;
+          font-size: 16px;
+          line-height: 24px;
+          color: #94a3b8;
         }
 
         .app-loading-track {
+          width: min(400px, 100%);
           height: 5px;
+          margin: 40px auto 0;
           overflow: hidden;
-          background: #e8eef8;
+          background: #e9eef7;
           border-radius: 999px;
         }
 
         .app-loading-progress {
-          width: 42%;
+          width: 56%;
           height: 100%;
-          background: linear-gradient(90deg, #2563eb, #6366f1, #38bdf8);
+          background: linear-gradient(90deg, #4f6df5 0%, #3c8ef6 52%, #43c8ec 100%);
           border-radius: inherit;
-          animation: loading-progress 1.35s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-          transform: translateX(-115%);
+          animation: loading-progress 1.6s ease-in-out infinite;
+          transform: translateX(-105%);
         }
 
         @keyframes loading-progress {
           to {
-            transform: translateX(340%);
+            transform: translateX(185%);
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
           .app-loading-progress {
-            width: 100%;
+            width: 56%;
             animation: none;
             transform: none;
           }
         }
 
-        @media (prefers-color-scheme: dark) {
+        @media (width <= 560px) {
           .app-loading {
-            color: #f2f4f7;
-            background: #0b1220;
+            padding-bottom: 2vh;
           }
 
-          .app-loading-card {
-            background: #111a2a;
-            border-color: #27364a;
+          .app-loading-brand {
+            gap: 16px;
           }
 
-          .app-loading-title,
-          .app-loading-status strong {
-            color: #f2f4f7;
+          .app-loading-logo {
+            width: 64px;
+            height: 64px;
           }
 
-          .app-loading-status {
-            color: #98a2b3;
+          .app-loading-heading {
+            margin-top: 34px;
+            font-size: 19px;
           }
 
-          .app-loading-track {
-            background: #223147;
+          .app-loading-description {
+            font-size: 14px;
           }
         }
       </style>
       <div class="app-loading" role="status" aria-live="polite" aria-label="Nimbus Framework加载中">
-        <div class="app-loading-card">
+        <div class="app-loading-content">
           <div class="app-loading-brand">
             <img
               src="/brand-mark.svg"
               class="app-loading-logo"
               alt="Nimbus Framework"
-              width="54"
-              height="54"
+              width="80"
+              height="80"
             />
-            <div>
-              <span class="app-loading-eyebrow">NIMBUS OPERATIONS</span>
-              <h1 class="app-loading-title">%VITE_APP_TITLE%</h1>
-            </div>
+            <h1 class="app-loading-title">%VITE_APP_TITLE%</h1>
           </div>
-          <div class="app-loading-status">
-            <strong>正在准备工作台…</strong>
-            <span>安全连接</span>
-          </div>
+          <p class="app-loading-heading">正在进入工作台...</p>
+          <p class="app-loading-description">请稍候，系统正在准备您的工作环境</p>
           <div class="app-loading-track" aria-hidden="true">
             <div class="app-loading-progress"></div>
           </div>

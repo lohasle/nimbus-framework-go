@@ -19,4 +19,4 @@ run:
 	go run ./cmd/server
 
 frontend-build:
-	cd frontend && corepack pnpm install --frozen-lockfile && corepack pnpm build:prod
+	cd ../frontend && corepack pnpm install --frozen-lockfile && corepack pnpm build:prod

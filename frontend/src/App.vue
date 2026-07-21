@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { isDark } from '@/utils/is'
 import { useAppStore } from '@/store/modules/app'
 import { useDesign } from '@/hooks/web/useDesign'
 import { CACHE_KEY, useCache } from '@/hooks/web/useCache'
@@ -14,13 +13,9 @@ const currentSize = computed(() => appStore.getCurrentSize)
 const greyMode = computed(() => appStore.getGreyMode)
 const { wsCache } = useCache()
 
-// 根据浏览器当前主题设置系统主题色
+// Nimbus 设计系统默认使用 Light；深色主题仅在用户主动切换后启用。
 const setDefaultTheme = () => {
-  let isDarkTheme = wsCache.get(CACHE_KEY.IS_DARK)
-  if (isDarkTheme === null) {
-    isDarkTheme = isDark()
-  }
-  appStore.setIsDark(isDarkTheme)
+  appStore.setIsDark(wsCache.get(CACHE_KEY.IS_DARK) === true)
 }
 setDefaultTheme()
 </script>

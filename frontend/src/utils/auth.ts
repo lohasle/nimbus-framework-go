@@ -4,14 +4,14 @@ import { decrypt, encrypt } from '@/utils/jsencrypt'
 
 const { wsCache } = useCache()
 
-const AccessTokenKey = 'ACCESS_TOKEN'
-const RefreshTokenKey = 'REFRESH_TOKEN'
+const AccessTokenKey = 'nimbus-go:ACCESS_TOKEN'
+const RefreshTokenKey = 'nimbus-go:REFRESH_TOKEN'
 
 // 获取token
 export const getAccessToken = () => {
   // 此处与TokenKey相同，此写法解决初始化时Cookies中不存在TokenKey报错
   const accessToken = wsCache.get(AccessTokenKey)
-  return accessToken ? accessToken : wsCache.get('ACCESS_TOKEN')
+  return accessToken
 }
 
 // 刷新token

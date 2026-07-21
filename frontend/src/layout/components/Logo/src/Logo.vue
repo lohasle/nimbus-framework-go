@@ -67,21 +67,21 @@ watch(
       :class="[
         prefixCls,
         getLayoutRenderMode(layout) !== 'classic' ? `${prefixCls}__Top` : '',
-        'flex !h-[var(--logo-height)] items-center cursor-pointer pl-8px relative decoration-none overflow-hidden'
+        'flex !h-[var(--logo-height)] items-center cursor-pointer pl-16px relative decoration-none overflow-hidden'
       ]"
       to="/"
     >
       <img
         alt="Nimbus Framework"
-        class="h-[calc(var(--logo-height)-10px)] w-[calc(var(--logo-height)-10px)]"
-        height="46"
+        class="h-40px w-40px shrink-0"
+        height="40"
         src="@/assets/svgs/nimbus-mark.svg"
-        width="46"
+        width="40"
       />
       <div
         v-if="show"
         :class="[
-          'ml-10px text-16px font-700',
+          'ml-12px text-16px font-700 leading-20px',
           {
             'text-[var(--logo-title-text-color)]': getLayoutRenderMode(layout) === 'classic',
             'text-[var(--top-header-text-color)]':

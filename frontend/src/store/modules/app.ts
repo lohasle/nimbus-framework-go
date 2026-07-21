@@ -11,6 +11,50 @@ import { store } from '../index'
 
 const { wsCache } = useCache()
 
+const NIMBUS_UI_THEME_VERSION = '2026.07-light-sidebar-v1'
+
+const createNimbusTheme = (dark: boolean): ThemeTypes =>
+  dark
+    ? {
+        elColorPrimary: '#7892ff',
+        leftMenuBorderColor: '#27364a',
+        leftMenuBgColor: '#0d1726',
+        leftMenuBgLightColor: '#162133',
+        leftMenuBgActiveColor: '#1a2d55',
+        leftMenuCollapseBgActiveColor: '#1a2d55',
+        leftMenuTextColor: '#c4cad4',
+        leftMenuTextActiveColor: '#8da3ff',
+        logoTitleTextColor: '#f2f4f7',
+        logoBorderColor: '#27364a',
+        topHeaderBgColor: '#111a2a',
+        topHeaderTextColor: '#c4cad4',
+        topHeaderHoverColor: '#17243a',
+        topToolBorderColor: '#27364a'
+      }
+    : {
+        elColorPrimary: '#165dff',
+        leftMenuBorderColor: '#f0f2f5',
+        leftMenuBgColor: '#ffffff',
+        leftMenuBgLightColor: '#ffffff',
+        leftMenuBgActiveColor: '#eaf1ff',
+        leftMenuCollapseBgActiveColor: '#eaf1ff',
+        leftMenuTextColor: '#1f2a44',
+        leftMenuTextActiveColor: '#165dff',
+        logoTitleTextColor: '#0b1739',
+        logoBorderColor: '#f0f2f5',
+        topHeaderBgColor: '#ffffff',
+        topHeaderTextColor: '#475467',
+        topHeaderHoverColor: '#f2f7ff',
+        topToolBorderColor: '#f0f2f5'
+      }
+
+// 设计规范升级时只迁移框架主题，避免历史缓存把 Light 侧栏继续覆盖为黑色。
+if (wsCache.get(CACHE_KEY.UI_THEME_VERSION) !== NIMBUS_UI_THEME_VERSION) {
+  wsCache.set(CACHE_KEY.IS_DARK, false)
+  wsCache.delete(CACHE_KEY.THEME)
+  wsCache.set(CACHE_KEY.UI_THEME_VERSION, NIMBUS_UI_THEME_VERSION)
+}
+
 interface AppState {
   breadcrumb: boolean
   breadcrumbIcon: boolean
@@ -72,38 +116,11 @@ export const useAppStore = defineStore('app', {
       fixedMenu: wsCache.get('fixedMenu') || false, // 是否固定菜单
 
       layout: normalizeLayout(wsCache.get(CACHE_KEY.LAYOUT)), // layout布局
-      isDark: wsCache.get(CACHE_KEY.IS_DARK) || false, // 是否是暗黑模式
+      isDark: wsCache.get(CACHE_KEY.IS_DARK) === true, // Nimbus 默认使用浅色主题
       currentSize: wsCache.get('default') || 'default', // 组件尺寸
-      theme: wsCache.get(CACHE_KEY.THEME) || {
-        // 主题色
-        elColorPrimary: '#3c63f3',
-        // 左侧菜单边框颜色
-        leftMenuBorderColor: '#e4e7ec',
-        // 左侧菜单背景颜色
-        leftMenuBgColor: '#fafbfd',
-        // 左侧菜单浅色背景颜色
-        leftMenuBgLightColor: '#f2f5fa',
-        // 左侧菜单选中背景颜色
-        leftMenuBgActiveColor: '#edf3ff',
-        // 左侧菜单收起选中背景颜色
-        leftMenuCollapseBgActiveColor: '#edf3ff',
-        // 左侧菜单字体颜色
-        leftMenuTextColor: '#475467',
-        // 左侧菜单选中字体颜色
-        leftMenuTextActiveColor: '#3c63f3',
-        // logo字体颜色
-        logoTitleTextColor: '#101828',
-        // logo边框颜色
-        logoBorderColor: '#e4e7ec',
-        // 头部背景颜色
-        topHeaderBgColor: '#fff',
-        // 头部字体颜色
-        topHeaderTextColor: '#475467',
-        // 头部悬停颜色
-        topHeaderHoverColor: '#f4f7fc',
-        // 头部边框颜色
-        topToolBorderColor: '#e4e7ec'
-      }
+      theme:
+        wsCache.get(CACHE_KEY.THEME) ||
+        createNimbusTheme(wsCache.get(CACHE_KEY.IS_DARK) === true)
     }
   },
   getters: {
@@ -301,7 +318,9 @@ export const useAppStore = defineStore('app', {
         document.documentElement.classList.remove('dark')
       }
       wsCache.set(CACHE_KEY.IS_DARK, this.isDark)
-      this.setPrimaryLight()
+      this.theme = createNimbusTheme(this.isDark)
+      wsCache.set(CACHE_KEY.THEME, this.theme)
+      this.setCssVarTheme()
     },
     setCurrentSize(currentSize: ElementPlusSize) {
       this.currentSize = currentSize

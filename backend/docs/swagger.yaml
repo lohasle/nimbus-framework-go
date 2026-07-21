@@ -1,0 +1,1792 @@
+basePath: /admin-api
+definitions:
+  github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response:
+    properties:
+      code:
+        example: 0
+        type: integer
+      data: {}
+      msg:
+        example: ""
+        type: string
+    type: object
+  internal_modules_infra.ConfigSaveRequest:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      key:
+        type: string
+      name:
+        type: string
+      remark:
+        type: string
+      type:
+        type: integer
+      value:
+        type: string
+      visible:
+        type: boolean
+    required:
+    - category
+    - key
+    - name
+    type: object
+  internal_modules_infra.FileConfigSaveRequest:
+    properties:
+      config:
+        type: string
+      id:
+        type: integer
+      master:
+        type: boolean
+      name:
+        type: string
+      remark:
+        type: string
+      storage:
+        type: integer
+    required:
+    - name
+    type: object
+  internal_modules_member.GroupSaveRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      status:
+        type: integer
+    required:
+    - name
+    type: object
+  internal_modules_member.LevelSaveRequest:
+    properties:
+      backgroundUrl:
+        type: string
+      discountPercent:
+        type: integer
+      experience:
+        type: integer
+      icon:
+        type: string
+      id:
+        type: integer
+      level:
+        type: integer
+      name:
+        type: string
+      status:
+        type: integer
+    required:
+    - level
+    - name
+    type: object
+  internal_modules_member.TagSaveRequest:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      status:
+        type: integer
+    required:
+    - name
+    type: object
+  internal_modules_member.UserSaveRequest:
+    properties:
+      avatar:
+        type: string
+      groupId:
+        type: integer
+      id:
+        type: integer
+      levelId:
+        type: integer
+      mobile:
+        type: string
+      nickname:
+        type: string
+      remark:
+        type: string
+      sex:
+        type: integer
+      status:
+        type: integer
+      tagIds:
+        items:
+          type: integer
+        type: array
+    required:
+    - nickname
+    type: object
+  internal_modules_pay.AppSaveRequest:
+    properties:
+      appKey:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      status:
+        type: integer
+    required:
+    - name
+    type: object
+  internal_modules_pay.ChannelSaveRequest:
+    properties:
+      appId:
+        type: integer
+      code:
+        type: string
+      config:
+        type: string
+      feeRate:
+        type: integer
+      id:
+        type: integer
+      remark:
+        type: string
+      status:
+        type: integer
+    required:
+    - appId
+    - code
+    type: object
+  internal_modules_pay.OrderCreateRequest:
+    properties:
+      appId:
+        type: integer
+      body:
+        type: string
+      channelCode:
+        type: string
+      merchantOrderId:
+        type: string
+      price:
+        type: integer
+      subject:
+        type: string
+    required:
+    - appId
+    - merchantOrderId
+    - price
+    - subject
+    type: object
+  internal_modules_pay.RefundCreateRequest:
+    properties:
+      merchantRefundId:
+        type: string
+      orderId:
+        type: integer
+      reason:
+        type: string
+      refundPrice:
+        type: integer
+    required:
+    - merchantRefundId
+    - orderId
+    - refundPrice
+    type: object
+  internal_modules_system.LoginRequest:
+    properties:
+      password:
+        example: admin123
+        type: string
+      username:
+        example: admin
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  internal_modules_system.UserSaveRequest:
+    properties:
+      deptId:
+        type: integer
+      email:
+        type: string
+      id:
+        type: integer
+      mobile:
+        type: string
+      nickname:
+        type: string
+      password:
+        type: string
+      postIds:
+        items:
+          type: integer
+        type: array
+      remark:
+        type: string
+      roleIds:
+        items:
+          type: integer
+        type: array
+      sex:
+        type: integer
+      status:
+        type: integer
+      username:
+        type: string
+    required:
+    - nickname
+    type: object
+info:
+  contact: {}
+  description: 'Go modular-monolith scaffold for operations platforms. Default database:
+    MySQL 8.4.'
+  title: Nimbus Framework Go API
+  version: "1.0"
+paths:
+  /app/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /application/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /im/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /infra/api-access-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page API access logs
+      tags:
+      - Infra Logging
+  /infra/config/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Config
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.ConfigSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a system parameter
+      tags:
+      - Infra Config
+  /infra/config/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a system parameter
+      tags:
+      - Infra Config
+  /infra/config/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete system parameters in batch
+      tags:
+      - Infra Config
+  /infra/config/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a system parameter
+      tags:
+      - Infra Config
+  /infra/config/get-value-by-key:
+    get:
+      parameters:
+      - description: Config key
+        in: query
+        name: key
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Get a public parameter value by key
+      tags:
+      - Infra Config
+  /infra/config/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page system parameters
+      tags:
+      - Infra Config
+  /infra/config/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Config
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.ConfigSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a system parameter
+      tags:
+      - Infra Config
+  /infra/file-config/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: File config
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.FileConfigSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a file storage configuration
+      tags:
+      - Infra File
+  /infra/file-config/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a file storage configuration
+      tags:
+      - Infra File
+  /infra/file-config/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete file storage configurations in batch
+      tags:
+      - Infra File
+  /infra/file-config/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a file storage configuration
+      tags:
+      - Infra File
+  /infra/file-config/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page file storage configurations
+      tags:
+      - Infra File
+  /infra/file-config/test:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Validate a file storage configuration
+      tags:
+      - Infra File
+  /infra/file-config/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: File config
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.FileConfigSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a file storage configuration
+      tags:
+      - Infra File
+  /infra/file-config/update-master:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Set the primary file storage configuration
+      tags:
+      - Infra File
+  /infra/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /member/group/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.GroupSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a member group
+      tags:
+      - Member Group
+  /member/group/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a member level, group or tag
+      tags:
+      - Member Administration
+  /member/group/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a member group
+      tags:
+      - Member Group
+  /member/group/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member groups
+      tags:
+      - Member Group
+  /member/group/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled member groups
+      tags:
+      - Member Group
+  /member/group/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Group
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.GroupSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a member group
+      tags:
+      - Member Group
+  /member/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /member/level/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Level
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.LevelSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a member level
+      tags:
+      - Member Level
+  /member/level/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a member level, group or tag
+      tags:
+      - Member Administration
+  /member/level/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a member level
+      tags:
+      - Member Level
+  /member/level/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List member levels
+      tags:
+      - Member Level
+  /member/level/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member levels
+      tags:
+      - Member Level
+  /member/level/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled member levels
+      tags:
+      - Member Level
+  /member/level/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Level
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.LevelSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a member level
+      tags:
+      - Member Level
+  /member/tag/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tag
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.TagSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a member tag
+      tags:
+      - Member Tag
+  /member/tag/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a member level, group or tag
+      tags:
+      - Member Administration
+  /member/tag/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a member tag
+      tags:
+      - Member Tag
+  /member/tag/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member tags
+      tags:
+      - Member Tag
+  /member/tag/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled member tags
+      tags:
+      - Member Tag
+  /member/tag/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tag
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.TagSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a member tag
+      tags:
+      - Member Tag
+  /member/user/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Member
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.UserSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create an APP member
+      tags:
+      - Member User
+  /member/user/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an APP member
+      tags:
+      - Member User
+  /member/user/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get an APP member
+      tags:
+      - Member User
+  /member/user/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page APP members
+      tags:
+      - Member User
+  /member/user/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Member
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_member.UserSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an APP member
+      tags:
+      - Member User
+  /member/user/update-level:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Change a member's level
+      tags:
+      - Member User
+  /member/user/update-point:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Adjust a member's points
+      tags:
+      - Member User
+  /member/user/update-status:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Change an APP member status
+      tags:
+      - Member User
+  /pay/app/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment app
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.AppSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a payment application
+      tags:
+      - Pay App
+  /pay/app/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a payment application
+      tags:
+      - Pay App
+  /pay/app/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a payment application
+      tags:
+      - Pay App
+  /pay/app/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List payment applications
+      tags:
+      - Pay App
+  /pay/app/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page payment applications
+      tags:
+      - Pay App
+  /pay/app/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled payment applications
+      tags:
+      - Pay App
+  /pay/app/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment app
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.AppSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a payment application
+      tags:
+      - Pay App
+  /pay/app/update-status:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Change a payment application status
+      tags:
+      - Pay App
+  /pay/channel/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment channel
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.ChannelSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a payment channel
+      tags:
+      - Pay Channel
+  /pay/channel/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a payment channel
+      tags:
+      - Pay Channel
+  /pay/channel/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a payment channel
+      tags:
+      - Pay Channel
+  /pay/channel/get-enable-channel-code-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled channel codes for an application
+      tags:
+      - Pay Channel
+  /pay/channel/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page payment channels
+      tags:
+      - Pay Channel
+  /pay/channel/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment channel
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.ChannelSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a payment channel
+      tags:
+      - Pay Channel
+  /pay/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /pay/order/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment order
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.OrderCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a pending payment order
+      tags:
+      - Pay Order
+  /pay/order/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a payment order
+      tags:
+      - Pay Order
+  /pay/order/get-detail:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a payment order detail
+      tags:
+      - Pay Order
+  /pay/order/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page payment orders
+      tags:
+      - Pay Order
+  /pay/refund/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refund
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.RefundCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a pending refund request
+      tags:
+      - Pay Refund
+  /pay/refund/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a pending refund record
+      tags:
+      - Pay Refund
+  /pay/refund/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a payment refund
+      tags:
+      - Pay Refund
+  /pay/refund/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page payment refunds
+      tags:
+      - Pay Refund
+  /system/auth/get-permission-info:
+    get:
+      description: Returns current admin profile, roles, permissions and menu tree.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Current user and menus
+      tags:
+      - System Auth
+  /system/auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates an operations-console user in a tenant.
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        required: true
+        type: integer
+      - description: Credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Admin login
+      tags:
+      - System Auth
+  /system/auth/logout:
+    post:
+      description: Ends the client session. JWT tokens expire naturally in this scaffold.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Admin logout
+      tags:
+      - System Auth
+  /system/dept/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled departments
+      tags:
+      - System Organization
+  /system/dict-data/simple-list:
+    get:
+      description: Returns enabled dictionary entries required by the operations console.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Frontend dictionary bootstrap
+      tags:
+      - System Bootstrap
+  /system/health:
+    get:
+      description: Health endpoint used by deployment probes and scaffold modules.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Service health
+      tags:
+      - Health
+  /system/notify-message/get-unread-count:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Count current user's unread messages
+      tags:
+      - System Notification
+  /system/notify-message/get-unread-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List current user's latest unread messages
+      tags:
+      - System Notification
+  /system/post/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled posts
+      tags:
+      - System Organization
+  /system/tenant/get-by-website:
+    get:
+      description: Returns an enabled tenant matching the request host, or null when
+        no custom host is configured.
+      parameters:
+      - description: Website host
+        in: query
+        name: website
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Resolve tenant by website host
+      tags:
+      - System Tenant
+  /system/tenant/get-id-by-name:
+    get:
+      description: Returns an enabled tenant ID by tenant name.
+      parameters:
+      - description: Tenant name
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Resolve tenant ID
+      tags:
+      - System Auth
+  /system/user/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.UserSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create an operations-console user
+      tags:
+      - System User
+  /system/user/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an operations-console user
+      tags:
+      - System User
+  /system/user/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete operations-console users in batch
+      tags:
+      - System User
+  /system/user/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get an operations-console user
+      tags:
+      - System User
+  /system/user/get-simple:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a compact user card
+      tags:
+      - System User
+  /system/user/list-by-nickname:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Search users by nickname
+      tags:
+      - System User
+  /system/user/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page operations-console users
+      tags:
+      - System User
+  /system/user/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled operations-console users
+      tags:
+      - System User
+  /system/user/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: User
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.UserSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an operations-console user
+      tags:
+      - System User
+  /system/user/update-password:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Reset a user password
+      tags:
+      - System User
+  /system/user/update-status:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Change a user status
+      tags:
+      - System User
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

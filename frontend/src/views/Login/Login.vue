@@ -220,6 +220,7 @@ const prefixCls = getPrefixCls('login')
     background: var(--bg-surface);
     border: 1px solid var(--border-default);
     border-radius: var(--radius-xl);
+    box-shadow: 0 16px 48px rgb(16 24 40 / 5%);
   }
 
   &__form-brand {

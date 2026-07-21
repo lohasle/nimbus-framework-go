@@ -592,7 +592,7 @@ $prefix-cls: #{$namespace}-menu;
     .#{$elNamespace}-menu-item {
       &:hover {
         color: var(--left-menu-text-active-color) !important;
-        background-color: var(--left-menu-bg-color) !important;
+        background-color: var(--bg-hover) !important;
       }
     }
 
@@ -614,7 +614,7 @@ $prefix-cls: #{$namespace}-menu;
     .#{$elNamespace}-menu {
       .#{$elNamespace}-sub-menu__title,
       .#{$elNamespace}-menu-item:not(.is-active) {
-        background-color: var(--left-menu-bg-light-color) !important;
+        background-color: transparent !important;
       }
     }
   }
@@ -641,9 +641,51 @@ $prefix-cls: #{$namespace}-menu;
   // 垂直菜单
   &__vertical {
     :deep(.#{$elNamespace}-menu--vertical) {
+      --el-menu-item-height: 40px;
+      --el-menu-sub-item-height: 40px;
+      --el-menu-base-level-padding: 16px;
+      --el-menu-level-padding: 12px;
+      --el-menu-icon-width: 16px;
+
+      padding: 8px;
+
+      .#{$elNamespace}-sub-menu__title,
+      .#{$elNamespace}-menu-item {
+        height: 40px;
+        min-height: 40px;
+        margin: 2px 0;
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        border-radius: 8px;
+      }
+
+      .#{$elNamespace}-menu-item [class*='#{$elNamespace}-icon'],
+      .#{$elNamespace}-sub-menu__title [class*='#{$elNamespace}-icon'] {
+        width: 16px;
+        height: 16px;
+        margin-right: 12px;
+      }
+
+      .#{$elNamespace}-menu-item svg,
+      .#{$elNamespace}-sub-menu__title svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      & > .#{$elNamespace}-sub-menu > .#{$elNamespace}-sub-menu__title {
+        margin-top: 8px;
+        font-weight: 500;
+        color: #94a3b8 !important;
+      }
+
+      & > .#{$elNamespace}-sub-menu.is-active > .#{$elNamespace}-sub-menu__title {
+        color: #94a3b8 !important;
+      }
+
       &:not(.#{$elNamespace}-menu--collapse) .#{$elNamespace}-sub-menu__title,
       .#{$elNamespace}-menu-item {
-        padding-right: 0;
+        padding-right: 16px;
       }
     }
   }
@@ -756,7 +798,7 @@ $prefix-cls: #{$namespace}-menu-popper;
   .el-menu-item {
     &:hover {
       color: var(--left-menu-text-active-color) !important;
-      background-color: var(--left-menu-bg-color) !important;
+      background-color: var(--bg-hover) !important;
     }
   }
 

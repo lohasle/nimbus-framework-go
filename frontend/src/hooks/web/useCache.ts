@@ -6,20 +6,23 @@ import WebStorageCache from 'web-storage-cache'
 
 type CacheType = 'localStorage' | 'sessionStorage'
 
+const CACHE_NAMESPACE = 'nimbus-go:'
+
 export const CACHE_KEY = {
   // 用户相关
-  ROLE_ROUTERS: 'roleRouters',
-  USER: 'user',
-  VisitTenantId: 'visitTenantId',
+  ROLE_ROUTERS: `${CACHE_NAMESPACE}roleRouters`,
+  USER: `${CACHE_NAMESPACE}user`,
+  VisitTenantId: `${CACHE_NAMESPACE}visitTenantId`,
   // 系统设置
-  IS_DARK: 'isDark',
-  LANG: 'lang',
-  THEME: 'theme',
-  LAYOUT: 'layout',
-  DICT_CACHE: 'dictCache',
+  IS_DARK: `${CACHE_NAMESPACE}isDark`,
+  UI_THEME_VERSION: `${CACHE_NAMESPACE}uiThemeVersion`,
+  LANG: `${CACHE_NAMESPACE}lang`,
+  THEME: `${CACHE_NAMESPACE}theme`,
+  LAYOUT: `${CACHE_NAMESPACE}layout`,
+  DICT_CACHE: `${CACHE_NAMESPACE}dictCache`,
   // 登录表单
-  LoginForm: 'loginForm',
-  TenantId: 'tenantId'
+  LoginForm: `${CACHE_NAMESPACE}loginForm`,
+  TenantId: `${CACHE_NAMESPACE}tenantId`
 }
 
 export const useCache = (type: CacheType = 'localStorage') => {
