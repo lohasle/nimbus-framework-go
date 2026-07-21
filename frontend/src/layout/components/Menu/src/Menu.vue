@@ -676,11 +676,11 @@ $prefix-cls: #{$namespace}-menu;
       & > .#{$elNamespace}-sub-menu > .#{$elNamespace}-sub-menu__title {
         margin-top: 8px;
         font-weight: 500;
-        color: #94a3b8 !important;
+        color: var(--left-menu-text-color) !important;
       }
 
       & > .#{$elNamespace}-sub-menu.is-active > .#{$elNamespace}-sub-menu__title {
-        color: #94a3b8 !important;
+        color: var(--left-menu-text-color) !important;
       }
 
       &:not(.#{$elNamespace}-menu--collapse) .#{$elNamespace}-sub-menu__title,
