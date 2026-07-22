@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lohasle/nimbus-framework-go/internal/platform/httpx"
@@ -48,6 +49,9 @@ func (h *Handler) UserPage(c *gin.Context) {
 	if nickname := strings.TrimSpace(c.Query("nickname")); nickname != "" {
 		query = query.Where("nickname LIKE ?", "%"+nickname+"%")
 	}
+	if email := strings.TrimSpace(c.Query("email")); email != "" {
+		query = query.Where("email LIKE ?", "%"+email+"%")
+	}
 	if status := c.Query("status"); status != "" {
 		query = query.Where("status = ?", status)
 	}
@@ -57,12 +61,25 @@ func (h *Handler) UserPage(c *gin.Context) {
 	if groupID := c.Query("groupId"); groupID != "" {
 		query = query.Where("group_id = ?", groupID)
 	}
+	if tagIDs := uintQueryValues(c, "tagIds"); len(tagIDs) > 0 {
+		query = query.Where("id IN (?)", h.db.Model(&UserTag{}).Select("user_id").Where("tag_id IN ?", tagIDs))
+	}
+	if values := queryValues(c, "createTime"); len(values) == 2 {
+		query = query.Where("created_at BETWEEN ? AND ?", values[0], values[1])
+	}
+	if values := queryValues(c, "loginDate"); len(values) == 2 {
+		query = query.Where("login_date BETWEEN ? AND ?", values[0], values[1])
+	}
 	var total int64
 	query.Count(&total)
 	pageNo, pageSize := page(c)
 	var rows []User
 	query.Order("id DESC").Offset((pageNo - 1) * pageSize).Limit(pageSize).Find(&rows)
-	httpx.OK(c, gin.H{"list": rows, "total": total})
+	views := make([]gin.H, 0, len(rows))
+	for _, row := range rows {
+		views = append(views, h.userView(row))
+	}
+	httpx.OK(c, gin.H{"list": views, "total": total})
 }
 
 // UserGet godoc
@@ -80,7 +97,9 @@ func (h *Handler) UserGet(c *gin.Context) {
 	}
 	var tagIDs []uint64
 	h.db.Model(&UserTag{}).Where("user_id = ?", row.ID).Pluck("tag_id", &tagIDs)
-	httpx.OK(c, gin.H{"id": row.ID, "tenantId": row.TenantID, "mobile": row.Mobile, "nickname": row.Nickname, "avatar": row.Avatar, "sex": row.Sex, "status": row.Status, "levelId": row.LevelID, "groupId": row.GroupID, "tagIds": tagIDs, "point": row.Point, "experience": row.Experience, "balance": row.Balance, "remark": row.Remark, "createTime": row.CreatedAt})
+	view := h.userView(row)
+	view["tagIds"] = tagIDs
+	httpx.OK(c, view)
 }
 
 // UserCreate godoc
@@ -166,8 +185,21 @@ func (h *Handler) UserDelete(c *gin.Context) {
 	id := queryID(c)
 	tx := h.db.Begin()
 	tx.Where("user_id = ?", id).Delete(&UserTag{})
+	tx.Where("tenant_id = ? AND user_id = ?", tenantID(c), id).Delete(&PointRecord{})
+	tx.Where("tenant_id = ? AND user_id = ?", tenantID(c), id).Delete(&ExperienceRecord{})
+	tx.Where("tenant_id = ? AND user_id = ?", tenantID(c), id).Delete(&Address{})
+	tx.Where("tenant_id = ? AND user_id = ?", tenantID(c), id).Delete(&SignInRecord{})
+	var walletIDs []uint64
+	tx.Table("pay_wallet").Where("tenant_id = ? AND user_id = ?", tenantID(c), id).Pluck("id", &walletIDs)
+	if len(walletIDs) > 0 {
+		tx.Exec("DELETE FROM pay_wallet_transaction WHERE tenant_id = ? AND wallet_id IN ?", tenantID(c), walletIDs)
+	}
+	tx.Exec("DELETE FROM pay_wallet WHERE tenant_id = ? AND user_id = ?", tenantID(c), id)
 	tx.Where("tenant_id = ? AND id = ?", tenantID(c), id).Delete(&User{})
-	tx.Commit()
+	if tx.Commit().Error != nil {
+		httpx.Fail(c, http.StatusInternalServerError, 500, "删除会员失败")
+		return
+	}
 	httpx.OK(c, true)
 }
 
@@ -240,6 +272,7 @@ func (h *Handler) LevelPage(c *gin.Context) { h.pageLevels(c, false) }
 // @Security BearerAuth
 // @Success 200 {object} httpx.Response
 // @Router /member/level/simple-list [get]
+// @Router /member/level/list-all-simple [get]
 func (h *Handler) LevelSimple(c *gin.Context) { h.pageLevels(c, true) }
 
 // LevelList godoc
@@ -302,6 +335,7 @@ func (h *Handler) GroupPage(c *gin.Context) { h.pageGroups(c, false) }
 // @Security BearerAuth
 // @Success 200 {object} httpx.Response
 // @Router /member/group/simple-list [get]
+// @Router /member/group/list-all-simple [get]
 func (h *Handler) GroupSimple(c *gin.Context) { h.pageGroups(c, true) }
 
 // GroupGet godoc
@@ -351,6 +385,7 @@ func (h *Handler) TagPage(c *gin.Context) { h.pageTags(c, false) }
 // @Security BearerAuth
 // @Success 200 {object} httpx.Response
 // @Router /member/tag/simple-list [get]
+// @Router /member/tag/list-all-simple [get]
 func (h *Handler) TagSimple(c *gin.Context) { h.pageTags(c, true) }
 
 // TagGet godoc
@@ -510,7 +545,77 @@ func (h *Handler) getEntity(c *gin.Context, model any, notFound string) {
 }
 
 func applyUser(row *User, req UserSaveRequest) {
-	row.Mobile, row.Nickname, row.Avatar = req.Mobile, req.Nickname, req.Avatar
-	row.Sex, row.Status, row.LevelID, row.GroupID = req.Sex, req.Status, req.LevelID, req.GroupID
+	row.Mobile, row.Email, row.Name = req.Mobile, req.Email, req.Name
+	row.Nickname, row.Avatar = req.Nickname, req.Avatar
+	row.Sex, row.Status, row.LevelID, row.GroupID, row.AreaID = req.Sex, req.Status, req.LevelID, req.GroupID, req.AreaID
 	row.Remark = req.Remark
+	if req.Mark != "" {
+		row.Remark = req.Mark
+	}
+	if req.Birthday != nil && *req.Birthday > 0 {
+		birthday := time.UnixMilli(*req.Birthday)
+		row.Birthday = &birthday
+	}
+}
+
+func (h *Handler) userView(row User) gin.H {
+	var levelName any
+	if row.LevelID > 0 {
+		var level Level
+		if h.db.Where("tenant_id = ? AND id = ?", row.TenantID, row.LevelID).First(&level).Error == nil {
+			levelName = level.Name
+		}
+	}
+	var groupName any
+	if row.GroupID > 0 {
+		var group Group
+		if h.db.Where("tenant_id = ? AND id = ?", row.TenantID, row.GroupID).First(&group).Error == nil {
+			groupName = group.Name
+		}
+	}
+	var tagIDs []uint64
+	h.db.Model(&UserTag{}).Where("user_id = ?", row.ID).Pluck("tag_id", &tagIDs)
+	var tagNames []string
+	if len(tagIDs) > 0 {
+		h.db.Model(&Tag{}).Where("tenant_id = ? AND id IN ?", row.TenantID, tagIDs).Order("id").Pluck("name", &tagNames)
+	}
+	var birthday any
+	if row.Birthday != nil {
+		birthday = row.Birthday.UnixMilli()
+	}
+	return gin.H{
+		"id": row.ID, "tenantId": row.TenantID, "mobile": row.Mobile, "email": row.Email,
+		"name": row.Name, "nickname": row.Nickname, "avatar": row.Avatar, "sex": row.Sex,
+		"status": row.Status, "levelId": row.LevelID, "levelName": levelName, "groupId": row.GroupID, "groupName": groupName,
+		"areaId": row.AreaID, "areaName": "", "birthday": birthday, "tagIds": tagIDs, "tagNames": tagNames,
+		"point": row.Point, "totalPoint": row.Point, "experience": row.Experience, "balance": row.Balance,
+		"mark": row.Remark, "remark": row.Remark, "registerIp": row.RegisterIP, "loginIp": row.LoginIP,
+		"loginDate": row.LoginDate, "createTime": row.CreatedAt,
+	}
+}
+
+func queryValues(c *gin.Context, name string) []string {
+	query := c.Request.URL.Query()
+	values := append([]string{}, query[name]...)
+	values = append(values, query[name+"[]"]...)
+	for index := 0; ; index++ {
+		value := query.Get(name + "[" + strconv.Itoa(index) + "]")
+		if value == "" {
+			break
+		}
+		values = append(values, value)
+	}
+	return values
+}
+
+func uintQueryValues(c *gin.Context, name string) []uint64 {
+	var result []uint64
+	for _, value := range queryValues(c, name) {
+		for _, part := range strings.Split(value, ",") {
+			if id, err := strconv.ParseUint(strings.TrimSpace(part), 10, 64); err == nil && id > 0 {
+				result = append(result, id)
+			}
+		}
+	}
+	return result
 }

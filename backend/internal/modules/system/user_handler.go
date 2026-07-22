@@ -73,6 +73,26 @@ func (h *Handler) UserPage(c *gin.Context) {
 	httpx.OK(c, gin.H{"list": h.userViews(tenantID, users), "total": total})
 }
 
+// UserList godoc
+// @Summary List operations-console users by IDs
+// @Tags System User
+// @Produce json
+// @Security BearerAuth
+// @Param ids query string true "Comma-separated user IDs"
+// @Success 200 {object} httpx.Response
+// @Router /system/user/list [get]
+func (h *Handler) UserList(c *gin.Context) {
+	ids := splitIDs(c.Query("ids"))
+	if len(ids) == 0 {
+		httpx.OK(c, []UserView{})
+		return
+	}
+	var users []AdminUser
+	tenantID := tenantIDFromContext(c)
+	h.service.db.Where("tenant_id = ? AND id IN ?", tenantID, ids).Order("id").Find(&users)
+	httpx.OK(c, h.userViews(tenantID, users))
+}
+
 // SimpleUsers godoc
 // @Summary List enabled operations-console users
 // @Tags System User
@@ -156,6 +176,7 @@ func (h *Handler) UserCreate(c *gin.Context) {
 		httpx.Fail(c, http.StatusConflict, 409, "创建用户失败，请检查用户名是否重复")
 		return
 	}
+	h.replaceUserAssignments(user.ID, req.PostIDs, req.RoleIDs)
 	httpx.OK(c, user.ID)
 }
 
@@ -181,6 +202,7 @@ func (h *Handler) UserUpdate(c *gin.Context) {
 	}
 	applyUserSave(&user, req)
 	h.service.db.Save(&user)
+	h.replaceUserAssignments(user.ID, req.PostIDs, req.RoleIDs)
 	httpx.OK(c, true)
 }
 
@@ -192,7 +214,12 @@ func (h *Handler) UserUpdate(c *gin.Context) {
 // @Success 200 {object} httpx.Response
 // @Router /system/user/delete [delete]
 func (h *Handler) UserDelete(c *gin.Context) {
-	h.service.db.Where("tenant_id = ? AND id = ?", tenantIDFromContext(c), queryID(c)).Delete(&AdminUser{})
+	id := queryID(c)
+	tx := h.service.db.Begin()
+	tx.Where("user_id = ?", id).Delete(&UserRole{})
+	tx.Where("user_id = ?", id).Delete(&UserPost{})
+	tx.Where("tenant_id = ? AND id = ?", tenantIDFromContext(c), id).Delete(&AdminUser{})
+	tx.Commit()
 	httpx.OK(c, true)
 }
 
@@ -204,8 +231,12 @@ func (h *Handler) UserDelete(c *gin.Context) {
 // @Success 200 {object} httpx.Response
 // @Router /system/user/delete-list [delete]
 func (h *Handler) UserDeleteList(c *gin.Context) {
-	ids := strings.Split(c.Query("ids"), ",")
-	h.service.db.Where("tenant_id = ? AND id IN ?", tenantIDFromContext(c), ids).Delete(&AdminUser{})
+	ids := splitIDs(c.Query("ids"))
+	tx := h.service.db.Begin()
+	tx.Where("user_id IN ?", ids).Delete(&UserRole{})
+	tx.Where("user_id IN ?", ids).Delete(&UserPost{})
+	tx.Where("tenant_id = ? AND id IN ?", tenantIDFromContext(c), ids).Delete(&AdminUser{})
+	tx.Commit()
 	httpx.OK(c, true)
 }
 
@@ -287,9 +318,39 @@ func (h *Handler) userViews(tenantID uint64, users []AdminUser) []UserView {
 	}
 	views := make([]UserView, 0, len(users))
 	for _, user := range users {
-		views = append(views, UserView{AdminUser: user, DeptName: deptNames[user.DeptID], PostIDs: []uint64{}, RoleIDs: []uint64{}})
+		var postIDs, roleIDs []uint64
+		h.service.db.Model(&UserPost{}).Where("user_id = ?", user.ID).Order("post_id").Pluck("post_id", &postIDs)
+		h.service.db.Model(&UserRole{}).Where("user_id = ?", user.ID).Order("role_id").Pluck("role_id", &roleIDs)
+		views = append(views, UserView{AdminUser: user, DeptName: deptNames[user.DeptID], PostIDs: postIDs, RoleIDs: roleIDs})
 	}
 	return views
+}
+
+func (h *Handler) replaceUserAssignments(userID uint64, postIDs, roleIDs []uint64) {
+	tx := h.service.db.Begin()
+	tx.Where("user_id = ?", userID).Delete(&UserPost{})
+	for _, postID := range postIDs {
+		tx.Create(&UserPost{UserID: userID, PostID: postID})
+	}
+	if roleIDs != nil {
+		tx.Where("user_id = ?", userID).Delete(&UserRole{})
+		for _, roleID := range roleIDs {
+			tx.Create(&UserRole{UserID: userID, RoleID: roleID})
+		}
+	}
+	tx.Commit()
+}
+
+func splitIDs(raw string) []uint64 {
+	parts := strings.Split(raw, ",")
+	ids := make([]uint64, 0, len(parts))
+	for _, part := range parts {
+		id, err := strconv.ParseUint(strings.TrimSpace(part), 10, 64)
+		if err == nil && id > 0 {
+			ids = append(ids, id)
+		}
+	}
+	return ids
 }
 
 func applyUserSave(user *AdminUser, req UserSaveRequest) {

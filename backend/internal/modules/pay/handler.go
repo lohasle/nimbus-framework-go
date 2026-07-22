@@ -1,6 +1,7 @@
 package pay
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -46,12 +47,26 @@ func (h *Handler) AppPage(c *gin.Context) {
 	if name := strings.TrimSpace(c.Query("name")); name != "" {
 		query = query.Where("name LIKE ?", "%"+name+"%")
 	}
+	if status := strings.TrimSpace(c.Query("status")); status != "" {
+		query = query.Where("status = ?", status)
+	}
 	var total int64
 	query.Count(&total)
 	pageNo, pageSize := page(c)
 	var rows []App
 	query.Order("id DESC").Offset((pageNo - 1) * pageSize).Limit(pageSize).Find(&rows)
-	httpx.OK(c, gin.H{"list": rows, "total": total})
+	views := make([]gin.H, 0, len(rows))
+	for _, row := range rows {
+		var channelCodes []string
+		h.db.Model(&Channel{}).Where("tenant_id = ? AND app_id = ?", tenantID(c), row.ID).Order("id").Pluck("code", &channelCodes)
+		views = append(views, gin.H{
+			"id": row.ID, "appKey": row.AppKey, "name": row.Name, "status": row.Status, "remark": row.Remark,
+			"orderNotifyUrl": row.OrderNotifyURL, "refundNotifyUrl": row.RefundNotifyURL,
+			"transferNotifyUrl": row.TransferNotifyURL, "channelCodes": channelCodes,
+			"createTime": row.CreatedAt, "updateTime": row.UpdatedAt,
+		})
+	}
+	httpx.OK(c, gin.H{"list": views, "total": total})
 }
 
 // AppSimple godoc
@@ -171,6 +186,20 @@ func (h *Handler) ChannelPage(c *gin.Context) {
 	httpx.OK(c, gin.H{"list": rows, "total": total})
 }
 
+// ChannelList godoc
+// @Summary List payment channels for an application
+// @Tags Pay Channel
+// @Produce json
+// @Security BearerAuth
+// @Param appId query int true "Payment application ID"
+// @Success 200 {object} httpx.Response
+// @Router /pay/channel/list [get]
+func (h *Handler) ChannelList(c *gin.Context) {
+	var rows []Channel
+	h.db.Where("tenant_id = ? AND app_id = ?", tenantID(c), c.Query("appId")).Order("id").Find(&rows)
+	httpx.OK(c, rows)
+}
+
 // ChannelCodes godoc
 // @Summary List enabled channel codes for an application
 // @Tags Pay Channel
@@ -178,6 +207,7 @@ func (h *Handler) ChannelPage(c *gin.Context) {
 // @Security BearerAuth
 // @Success 200 {object} httpx.Response
 // @Router /pay/channel/get-enable-channel-code-list [get]
+// @Router /pay/channel/get-enable-code-list [get]
 func (h *Handler) ChannelCodes(c *gin.Context) {
 	var codes []string
 	h.db.Model(&Channel{}).Where("tenant_id = ? AND app_id = ? AND status = 0", tenantID(c), c.Query("appId")).Order("id").Pluck("code", &codes)
@@ -193,8 +223,22 @@ func (h *Handler) ChannelCodes(c *gin.Context) {
 // @Router /pay/channel/get [get]
 func (h *Handler) ChannelGet(c *gin.Context) {
 	var row Channel
-	if h.db.Where("tenant_id = ? AND id = ?", tenantID(c), queryID(c)).First(&row).Error != nil {
-		httpx.Fail(c, http.StatusNotFound, 404, "支付渠道不存在")
+	query := h.db.Where("tenant_id = ?", tenantID(c))
+	if id := queryID(c); id != 0 {
+		query = query.Where("id = ?", id)
+	} else {
+		appID := strings.TrimSpace(c.Query("appId"))
+		code := strings.TrimSpace(c.Query("code"))
+		if appID == "" || code == "" {
+			httpx.Fail(c, http.StatusBadRequest, 400, "支付渠道查询参数错误")
+			return
+		}
+		query = query.Where("app_id = ? AND code = ?", appID, code)
+	}
+	if query.First(&row).Error != nil {
+		// The payment-channel forms use an empty response to distinguish create
+		// from update. A missing appId+code pair is therefore not an HTTP 404.
+		httpx.OK(c, nil)
 		return
 	}
 	httpx.OK(c, row)
@@ -252,12 +296,25 @@ func (h *Handler) OrderPage(c *gin.Context) {
 	if merchant := strings.TrimSpace(c.Query("merchantOrderId")); merchant != "" {
 		query = query.Where("merchant_order_no LIKE ?", "%"+merchant+"%")
 	}
+	if channelCode := strings.TrimSpace(c.Query("channelCode")); channelCode != "" {
+		query = query.Where("channel_code = ?", channelCode)
+	}
+	if channelOrderNo := strings.TrimSpace(c.Query("channelOrderNo")); channelOrderNo != "" {
+		query = query.Where("channel_order_no LIKE ?", "%"+channelOrderNo+"%")
+	}
+	if no := strings.TrimSpace(c.Query("no")); no != "" {
+		query = query.Where("CAST(id AS CHAR) LIKE ?", "%"+strings.TrimPrefix(no, "P")+"%")
+	}
 	var total int64
 	query.Count(&total)
 	pageNo, pageSize := page(c)
 	var rows []Order
 	query.Order("id DESC").Offset((pageNo - 1) * pageSize).Limit(pageSize).Find(&rows)
-	httpx.OK(c, gin.H{"list": rows, "total": total})
+	views := make([]gin.H, 0, len(rows))
+	for _, row := range rows {
+		views = append(views, h.orderView(row))
+	}
+	httpx.OK(c, gin.H{"list": views, "total": total})
 }
 
 // OrderGet godoc
@@ -273,7 +330,7 @@ func (h *Handler) OrderGet(c *gin.Context) {
 		httpx.Fail(c, http.StatusNotFound, 404, "支付订单不存在")
 		return
 	}
-	httpx.OK(c, row)
+	httpx.OK(c, h.orderView(row))
 }
 
 // OrderDetail godoc
@@ -294,6 +351,7 @@ func (h *Handler) OrderDetail(c *gin.Context) { h.OrderGet(c) }
 // @Param request body OrderCreateRequest true "Payment order"
 // @Success 200 {object} httpx.Response
 // @Router /pay/order/create [post]
+// @Router /pay/order/submit [post]
 func (h *Handler) OrderCreate(c *gin.Context) {
 	var req OrderCreateRequest
 	if c.ShouldBindJSON(&req) != nil {
@@ -317,12 +375,37 @@ func (h *Handler) OrderCreate(c *gin.Context) {
 // @Router /pay/refund/page [get]
 func (h *Handler) RefundPage(c *gin.Context) {
 	query := h.db.Model(&Refund{}).Where("tenant_id = ?", tenantID(c))
+	if status := strings.TrimSpace(c.Query("status")); status != "" {
+		query = query.Where("status = ?", status)
+	}
+	if merchantRefund := strings.TrimSpace(c.Query("merchantRefundId")); merchantRefund != "" {
+		query = query.Where("merchant_refund_no LIKE ?", "%"+merchantRefund+"%")
+	}
+	if channelRefund := strings.TrimSpace(c.Query("channelRefundNo")); channelRefund != "" {
+		query = query.Where("channel_refund_no LIKE ?", "%"+channelRefund+"%")
+	}
+	if appID := strings.TrimSpace(c.Query("appId")); appID != "" {
+		query = query.Where("order_id IN (?)", h.db.Model(&Order{}).Select("id").Where("tenant_id = ? AND app_id = ?", tenantID(c), appID))
+	}
+	if channelCode := strings.TrimSpace(c.Query("channelCode")); channelCode != "" {
+		query = query.Where("order_id IN (?)", h.db.Model(&Order{}).Select("id").Where("tenant_id = ? AND channel_code = ?", tenantID(c), channelCode))
+	}
+	if merchantOrder := strings.TrimSpace(c.Query("merchantOrderId")); merchantOrder != "" {
+		query = query.Where("order_id IN (?)", h.db.Model(&Order{}).Select("id").Where("tenant_id = ? AND merchant_order_no LIKE ?", tenantID(c), "%"+merchantOrder+"%"))
+	}
+	if channelOrder := strings.TrimSpace(c.Query("channelOrderNo")); channelOrder != "" {
+		query = query.Where("order_id IN (?)", h.db.Model(&Order{}).Select("id").Where("tenant_id = ? AND channel_order_no LIKE ?", tenantID(c), "%"+channelOrder+"%"))
+	}
 	var total int64
 	query.Count(&total)
 	pageNo, pageSize := page(c)
 	var rows []Refund
 	query.Order("id DESC").Offset((pageNo - 1) * pageSize).Limit(pageSize).Find(&rows)
-	httpx.OK(c, gin.H{"list": rows, "total": total})
+	views := make([]gin.H, 0, len(rows))
+	for _, row := range rows {
+		views = append(views, h.refundView(row))
+	}
+	httpx.OK(c, gin.H{"list": views, "total": total})
 }
 
 // RefundGet godoc
@@ -338,7 +421,7 @@ func (h *Handler) RefundGet(c *gin.Context) {
 		httpx.Fail(c, http.StatusNotFound, 404, "退款单不存在")
 		return
 	}
-	httpx.OK(c, row)
+	httpx.OK(c, h.refundView(row))
 }
 
 // RefundCreate godoc
@@ -403,7 +486,10 @@ func (h *Handler) saveApp(c *gin.Context, update bool) {
 	if req.AppKey == "" {
 		req.AppKey = strings.ReplaceAll(uuid.NewString(), "-", "")
 	}
-	row := App{ID: req.ID, TenantID: tenantID(c), Name: req.Name, AppKey: req.AppKey, Status: req.Status, Remark: req.Remark}
+	row := App{
+		ID: req.ID, TenantID: tenantID(c), Name: req.Name, AppKey: req.AppKey, Status: req.Status, Remark: req.Remark,
+		OrderNotifyURL: req.OrderNotifyURL, RefundNotifyURL: req.RefundNotifyURL, TransferNotifyURL: req.TransferNotifyURL,
+	}
 	if update {
 		h.db.Where("tenant_id = ? AND id = ?", tenantID(c), req.ID).Updates(&row)
 		httpx.OK(c, true)
@@ -414,6 +500,36 @@ func (h *Handler) saveApp(c *gin.Context, update bool) {
 		return
 	}
 	httpx.OK(c, row.ID)
+}
+
+func (h *Handler) orderView(row Order) gin.H {
+	var app App
+	h.db.Where("tenant_id = ? AND id = ?", row.TenantID, row.AppID).First(&app)
+	return gin.H{
+		"id": row.ID, "no": fmt.Sprintf("P%020d", row.ID), "merchantOrderId": row.MerchantOrderNo,
+		"appId": row.AppID, "appName": app.Name, "status": row.Status, "price": row.Price,
+		"refundPrice": row.RefundPrice, "channelFeePrice": int64(0), "channelFeeRate": float64(0),
+		"successTime": row.SuccessTime, "expireTime": nil, "createTime": row.CreatedAt, "updateTime": row.UpdatedAt,
+		"subject": row.Subject, "body": row.Body, "channelCode": row.ChannelCode, "userIp": row.ClientIP,
+		"channelOrderNo": row.ChannelOrderNo, "channelUserId": "", "notifyUrl": app.OrderNotifyURL,
+		"extension": gin.H{"channelNotifyData": ""},
+	}
+}
+
+func (h *Handler) refundView(row Refund) gin.H {
+	var order Order
+	h.db.Where("tenant_id = ? AND id = ?", row.TenantID, row.OrderID).First(&order)
+	var app App
+	h.db.Where("tenant_id = ? AND id = ?", row.TenantID, order.AppID).First(&app)
+	return gin.H{
+		"id": row.ID, "no": fmt.Sprintf("R%020d", row.ID), "orderId": row.OrderID,
+		"merchantRefundId": row.MerchantRefundNo, "channelRefundNo": row.ChannelRefundNo,
+		"merchantOrderId": order.MerchantOrderNo, "channelOrderNo": order.ChannelOrderNo,
+		"appId": order.AppID, "appName": app.Name, "payPrice": order.Price, "refundPrice": row.Price,
+		"status": row.Status, "successTime": row.SuccessTime, "createTime": row.CreatedAt, "updateTime": row.UpdatedAt,
+		"channelCode": order.ChannelCode, "reason": row.Reason, "userIp": order.ClientIP,
+		"notifyUrl": app.RefundNotifyURL, "channelErrorCode": "", "channelErrorMsg": "", "channelNotifyData": "",
+	}
 }
 
 func (h *Handler) saveChannel(c *gin.Context, update bool) {

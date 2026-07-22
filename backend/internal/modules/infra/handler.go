@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lohasle/nimbus-framework-go/internal/platform/httpx"
@@ -304,13 +305,57 @@ func (h *Handler) FileConfigMaster(c *gin.Context) {
 // @Success 200 {object} httpx.Response
 // @Router /infra/api-access-log/page [get]
 func (h *Handler) AccessLogPage(c *gin.Context) {
-	query := h.db.Model(&APIAccessLog{}).Where("tenant_id = ?", tenantID(c))
+	query := h.accessLogQuery(c)
 	var total int64
 	query.Count(&total)
 	pageNo, pageSize := page(c)
 	var rows []APIAccessLog
 	query.Order("id DESC").Offset((pageNo - 1) * pageSize).Limit(pageSize).Find(&rows)
-	httpx.OK(c, gin.H{"list": rows, "total": total})
+	views := make([]gin.H, 0, len(rows))
+	for _, row := range rows {
+		resultCode := 0
+		resultMessage := ""
+		if row.Status >= http.StatusBadRequest {
+			resultCode = row.Status
+			resultMessage = http.StatusText(row.Status)
+		}
+		views = append(views, gin.H{
+			"id": row.ID, "traceId": row.TraceID, "userId": row.UserID, "userType": 2,
+			"applicationName": "nimbus-server", "requestMethod": row.Method, "requestUrl": row.Path,
+			"requestParams": "", "responseBody": "", "userIp": row.IP, "userAgent": row.UserAgent,
+			"operateModule": "", "operateName": "", "operateType": 0,
+			"beginTime": row.CreatedAt, "endTime": row.CreatedAt.Add(time.Duration(row.Duration) * time.Millisecond),
+			"duration": row.Duration, "resultCode": resultCode, "resultMsg": resultMessage, "createTime": row.CreatedAt,
+		})
+	}
+	httpx.OK(c, gin.H{"list": views, "total": total})
+}
+
+func (h *Handler) accessLogQuery(c *gin.Context) *gorm.DB {
+	query := h.db.Model(&APIAccessLog{}).Where("tenant_id = ?", tenantID(c))
+	if userID := strings.TrimSpace(c.Query("userId")); userID != "" {
+		query = query.Where("user_id = ?", userID)
+	}
+	if requestURL := strings.TrimSpace(c.Query("requestUrl")); requestURL != "" {
+		query = query.Where("path LIKE ?", "%"+requestURL+"%")
+	}
+	if application := strings.TrimSpace(c.Query("applicationName")); application != "" && !strings.Contains(strings.ToLower("nimbus-server"), strings.ToLower(application)) {
+		query = query.Where("1 = 0")
+	}
+	if duration := strings.TrimSpace(c.Query("duration")); duration != "" {
+		query = query.Where("duration >= ?", duration)
+	}
+	if resultCode := strings.TrimSpace(c.Query("resultCode")); resultCode != "" {
+		if resultCode == "0" {
+			query = query.Where("status < 400")
+		} else {
+			query = query.Where("status >= 400")
+		}
+	}
+	if begin, end := c.Query("beginTime[0]"), c.Query("beginTime[1]"); begin != "" && end != "" {
+		query = query.Where("created_at BETWEEN ? AND ?", begin, end)
+	}
+	return query
 }
 
 func applyConfig(row *Config, req ConfigSaveRequest) {

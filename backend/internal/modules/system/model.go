@@ -62,6 +62,31 @@ type Post struct {
 	UpdatedAt time.Time `json:"updateTime"`
 }
 
+type Role struct {
+	ID               uint64    `gorm:"primaryKey" json:"id"`
+	TenantID         uint64    `gorm:"index;not null" json:"tenantId"`
+	Name             string    `gorm:"size:64;not null" json:"name"`
+	Code             string    `gorm:"size:64;not null" json:"code"`
+	Sort             int       `gorm:"not null;default:0" json:"sort"`
+	Status           int       `gorm:"not null;default:0" json:"status"`
+	Type             int       `gorm:"not null;default:2" json:"type"`
+	DataScope        int       `gorm:"not null;default:1" json:"dataScope"`
+	DataScopeDeptIDs string    `gorm:"type:text" json:"-"`
+	Remark           string    `gorm:"size:512" json:"remark"`
+	CreatedAt        time.Time `json:"createTime"`
+	UpdatedAt        time.Time `json:"updateTime"`
+}
+
+type UserRole struct {
+	UserID uint64 `gorm:"primaryKey" json:"userId"`
+	RoleID uint64 `gorm:"primaryKey" json:"roleId"`
+}
+
+type UserPost struct {
+	UserID uint64 `gorm:"primaryKey" json:"userId"`
+	PostID uint64 `gorm:"primaryKey" json:"postId"`
+}
+
 type DictData struct {
 	ID        uint64    `gorm:"primaryKey" json:"id"`
 	Sort      int       `gorm:"not null;default:0" json:"sort"`

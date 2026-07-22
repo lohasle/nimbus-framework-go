@@ -8,7 +8,21 @@ import (
 	"github.com/google/uuid"
 )
 
-func RequestContext() gin.HandlerFunc {
+type RequestLog struct {
+	TraceID   string
+	TenantID  uint64
+	UserID    uint64
+	Method    string
+	Path      string
+	Status    int
+	Duration  int64
+	IP        string
+	UserAgent string
+}
+
+type RequestLogRecorder func(RequestLog)
+
+func RequestContext(recorders ...RequestLogRecorder) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		started := time.Now()
 		traceID := c.GetHeader("X-Trace-ID")
@@ -18,7 +32,20 @@ func RequestContext() gin.HandlerFunc {
 		c.Set("trace_id", traceID)
 		c.Header("X-Trace-ID", traceID)
 		c.Next()
-		slog.Info("http request", "trace_id", traceID, "method", c.Request.Method, "path", c.FullPath(), "status", c.Writer.Status(), "latency", time.Since(started))
+		latency := time.Since(started)
+		path := c.FullPath()
+		if path == "" {
+			path = c.Request.URL.Path
+		}
+		slog.Info("http request", "trace_id", traceID, "method", c.Request.Method, "path", path, "status", c.Writer.Status(), "latency", latency)
+		record := RequestLog{
+			TraceID: traceID, TenantID: c.GetUint64("tenant_id"), UserID: c.GetUint64("user_id"),
+			Method: c.Request.Method, Path: path, Status: c.Writer.Status(), Duration: latency.Milliseconds(),
+			IP: c.ClientIP(), UserAgent: c.Request.UserAgent(),
+		}
+		for _, recorder := range recorders {
+			recorder(record)
+		}
 	}
 }
 

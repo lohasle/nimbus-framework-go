@@ -28,6 +28,7 @@ func Register(group *gin.RouterGroup, db *gorm.DB, auth gin.HandlerFunc) {
 	config.PUT("/update", h.ConfigUpdate)
 	config.DELETE("/delete", h.ConfigDelete)
 	config.DELETE("/delete-list", h.ConfigDeleteList)
+	config.GET("/export-excel", h.ConfigExport)
 
 	fileConfig := group.Group("/infra/file-config", auth)
 	fileConfig.GET("/page", h.FileConfigPage)
@@ -41,4 +42,5 @@ func Register(group *gin.RouterGroup, db *gorm.DB, auth gin.HandlerFunc) {
 
 	logs := group.Group("/infra/api-access-log", auth)
 	logs.GET("/page", h.AccessLogPage)
+	logs.GET("/export-excel", h.AccessLogExport)
 }

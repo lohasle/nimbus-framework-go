@@ -6,7 +6,7 @@ import (
 )
 
 func Migrate(db *gorm.DB) error {
-	return db.AutoMigrate(&User{}, &Level{}, &Group{}, &Tag{}, &UserTag{}, &PointRecord{}, &ExperienceRecord{})
+	return db.AutoMigrate(&User{}, &Level{}, &Group{}, &Tag{}, &UserTag{}, &PointRecord{}, &ExperienceRecord{}, &Address{}, &SignInRecord{})
 }
 
 func Seed(db *gorm.DB, tenant uint64) error {
@@ -57,4 +57,10 @@ func Register(group *gin.RouterGroup, db *gorm.DB, auth gin.HandlerFunc) {
 	tags.POST("/create", h.TagCreate)
 	tags.PUT("/update", h.TagUpdate)
 	tags.DELETE("/delete", h.EntityDelete(&Tag{}))
+
+	group.GET("/member/point/record/page", auth, h.PointRecordPage)
+	group.GET("/member/experience-record/page", auth, h.ExperienceRecordPage)
+	group.GET("/member/experience-record/get", auth, h.ExperienceRecordGet)
+	group.GET("/member/sign-in/record/page", auth, h.SignInRecordPage)
+	group.GET("/member/address/list", auth, h.AddressList)
 }

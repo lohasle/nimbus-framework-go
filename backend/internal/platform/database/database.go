@@ -21,6 +21,9 @@ func Open(cfg config.Config) (*gorm.DB, error) {
 		&system.AdminUser{},
 		&system.Department{},
 		&system.Post{},
+		&system.Role{},
+		&system.UserRole{},
+		&system.UserPost{},
 		&system.DictData{},
 		&system.NotifyMessage{},
 	); err != nil {
@@ -62,6 +65,18 @@ func bootstrap(db *gorm.DB, cfg config.Config) error {
 		Name: "平台管理员", Code: "platform_admin", Sort: 0, Status: 0,
 	}).FirstOrCreate(&post).Error; err != nil {
 		return fmt.Errorf("bootstrap post: %w", err)
+	}
+	role := system.Role{TenantID: tenant.ID, Code: "super_admin"}
+	if err = db.Where("tenant_id = ? AND code = ?", tenant.ID, role.Code).Attrs(system.Role{
+		Name: "超级管理员", Sort: 1, Status: 0, Type: 1, DataScope: 1, Remark: "系统内置角色",
+	}).FirstOrCreate(&role).Error; err != nil {
+		return fmt.Errorf("bootstrap role: %w", err)
+	}
+	if err = db.Where(system.UserRole{UserID: user.ID, RoleID: role.ID}).FirstOrCreate(&system.UserRole{UserID: user.ID, RoleID: role.ID}).Error; err != nil {
+		return fmt.Errorf("bootstrap user role: %w", err)
+	}
+	if err = db.Where(system.UserPost{UserID: user.ID, PostID: post.ID}).FirstOrCreate(&system.UserPost{UserID: user.ID, PostID: post.ID}).Error; err != nil {
+		return fmt.Errorf("bootstrap user post: %w", err)
 	}
 	dicts := []system.DictData{
 		{DictType: "common_status", Label: "开启", Value: "0", Sort: 1, Status: 0, ColorType: "success"},

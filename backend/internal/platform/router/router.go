@@ -21,7 +21,16 @@ import (
 func New(handler *system.Handler, db *gorm.DB) *gin.Engine {
 	r := gin.New()
 	_ = r.SetTrustedProxies([]string{"127.0.0.1", "::1"})
-	r.Use(gin.Recovery(), middleware.CORS(), middleware.RequestContext())
+	r.Use(gin.Recovery(), middleware.CORS(), middleware.RequestContext(func(record middleware.RequestLog) {
+		if record.TenantID == 0 {
+			return
+		}
+		db.Create(&infra.APIAccessLog{
+			TenantID: record.TenantID, TraceID: record.TraceID, UserID: record.UserID,
+			Method: record.Method, Path: record.Path, Status: record.Status, Duration: record.Duration,
+			IP: record.IP, UserAgent: record.UserAgent,
+		})
+	}))
 	r.GET("/health", health("nimbus-server"))
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
@@ -36,6 +45,7 @@ func New(handler *system.Handler, db *gorm.DB) *gin.Engine {
 	admin.POST("/system/auth/logout", handler.Auth(), handler.Logout)
 	systemAdmin := admin.Group("/system", handler.Auth())
 	systemAdmin.GET("/user/page", handler.UserPage)
+	systemAdmin.GET("/user/list", handler.UserList)
 	systemAdmin.GET("/user/simple-list", handler.SimpleUsers)
 	systemAdmin.GET("/user/get-simple", handler.SimpleUser)
 	systemAdmin.GET("/user/list-by-nickname", handler.UsersByNickname)
@@ -46,8 +56,16 @@ func New(handler *system.Handler, db *gorm.DB) *gin.Engine {
 	systemAdmin.DELETE("/user/delete-list", handler.UserDeleteList)
 	systemAdmin.PUT("/user/update-password", handler.UserPassword)
 	systemAdmin.PUT("/user/update-status", handler.UserStatus)
+	systemAdmin.GET("/user/export-excel", handler.UserExport)
+	systemAdmin.GET("/user/get-import-template", handler.UserImportTemplate)
+	systemAdmin.POST("/user/import", handler.UserImport)
+	systemAdmin.GET("/role/simple-list", handler.SimpleRoles)
+	systemAdmin.GET("/permission/list-user-roles", handler.UserRoleList)
+	systemAdmin.POST("/permission/assign-user-role", handler.AssignUserRole)
 	systemAdmin.GET("/dept/simple-list", handler.SimpleDepartments)
 	systemAdmin.GET("/post/simple-list", handler.SimplePosts)
+	systemAdmin.GET("/area/tree", handler.AreaTree)
+	systemAdmin.GET("/area/get-by-ip", handler.AreaByIP)
 	infra.Register(admin, db, handler.Auth())
 	member.Register(admin, db, handler.Auth())
 	pay.Register(admin, db, handler.Auth())

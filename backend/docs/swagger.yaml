@@ -98,7 +98,13 @@ definitions:
     type: object
   internal_modules_member.UserSaveRequest:
     properties:
+      areaId:
+        type: integer
       avatar:
+        type: string
+      birthday:
+        type: integer
+      email:
         type: string
       groupId:
         type: integer
@@ -106,7 +112,11 @@ definitions:
         type: integer
       levelId:
         type: integer
+      mark:
+        type: string
       mobile:
+        type: string
+      name:
         type: string
       nickname:
         type: string
@@ -131,10 +141,16 @@ definitions:
         type: integer
       name:
         type: string
+      orderNotifyUrl:
+        type: string
+      refundNotifyUrl:
+        type: string
       remark:
         type: string
       status:
         type: integer
+      transferNotifyUrl:
+        type: string
     required:
     - name
     type: object
@@ -192,6 +208,38 @@ definitions:
     - merchantRefundId
     - orderId
     - refundPrice
+    type: object
+  internal_modules_pay.RefundUpdateRequest:
+    properties:
+      id:
+        type: integer
+      reason:
+        type: string
+      status:
+        type: integer
+    required:
+    - id
+    type: object
+  internal_modules_pay.WalletBalanceUpdateRequest:
+    properties:
+      balance:
+        type: integer
+      userId:
+        type: integer
+    required:
+    - balance
+    - userId
+    type: object
+  internal_modules_system.AssignUserRoleRequest:
+    properties:
+      roleIds:
+        items:
+          type: integer
+        type: array
+      userId:
+        type: integer
+    required:
+    - userId
     type: object
   internal_modules_system.LoginRequest:
     properties:
@@ -297,6 +345,20 @@ paths:
       summary: Service health
       tags:
       - Health
+  /infra/api-access-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export API access logs
+      tags:
+      - Infra Logging
   /infra/api-access-log/page:
     get:
       produces:
@@ -360,6 +422,20 @@ paths:
       security:
       - BearerAuth: []
       summary: Delete system parameters in batch
+      tags:
+      - Infra Config
+  /infra/config/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export system parameters
       tags:
       - Infra Config
   /infra/config/get:
@@ -574,6 +650,48 @@ paths:
       summary: Service health
       tags:
       - Health
+  /member/address/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List a member's addresses
+      tags:
+      - Member Detail
+  /member/experience-record/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a member experience record
+      tags:
+      - Member Detail
+  /member/experience-record/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member experience records
+      tags:
+      - Member Detail
   /member/group/create:
     post:
       consumes:
@@ -623,6 +741,20 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a member group
+      tags:
+      - Member Group
+  /member/group/list-all-simple:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled member groups
       tags:
       - Member Group
   /member/group/page:
@@ -754,6 +886,20 @@ paths:
       summary: List member levels
       tags:
       - Member Level
+  /member/level/list-all-simple:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled member levels
+      tags:
+      - Member Level
   /member/level/page:
     get:
       produces:
@@ -805,6 +951,34 @@ paths:
       summary: Update a member level
       tags:
       - Member Level
+  /member/point/record/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member point records
+      tags:
+      - Member Detail
+  /member/sign-in/record/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member sign-in records
+      tags:
+      - Member Detail
   /member/tag/create:
     post:
       consumes:
@@ -854,6 +1028,20 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a member tag
+      tags:
+      - Member Tag
+  /member/tag/list-all-simple:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled member tags
       tags:
       - Member Tag
   /member/tag/page:
@@ -1212,6 +1400,20 @@ paths:
       summary: Delete a payment channel
       tags:
       - Pay Channel
+  /pay/channel/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export payment channels
+      tags:
+      - Pay Channel
   /pay/channel/get:
     get:
       produces:
@@ -1238,6 +1440,40 @@ paths:
       security:
       - BearerAuth: []
       summary: List enabled channel codes for an application
+      tags:
+      - Pay Channel
+  /pay/channel/get-enable-code-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled channel codes for an application
+      tags:
+      - Pay Channel
+  /pay/channel/list:
+    get:
+      parameters:
+      - description: Payment application ID
+        in: query
+        name: appId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List payment channels for an application
       tags:
       - Pay Channel
   /pay/channel/page:
@@ -1313,6 +1549,20 @@ paths:
       summary: Create a pending payment order
       tags:
       - Pay Order
+  /pay/order/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export payment orders
+      tags:
+      - Pay Order
   /pay/order/get:
     get:
       produces:
@@ -1355,6 +1605,29 @@ paths:
       summary: Page payment orders
       tags:
       - Pay Order
+  /pay/order/submit:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Payment order
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.OrderCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a pending payment order
+      tags:
+      - Pay Order
   /pay/refund/create:
     post:
       consumes:
@@ -1392,6 +1665,20 @@ paths:
       summary: Delete a pending refund record
       tags:
       - Pay Refund
+  /pay/refund/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export payment refunds
+      tags:
+      - Pay Refund
   /pay/refund/get:
     get:
       produces:
@@ -1420,6 +1707,136 @@ paths:
       summary: Page payment refunds
       tags:
       - Pay Refund
+  /pay/refund/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Refund update
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.RefundUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a pending refund record
+      tags:
+      - Pay Refund
+  /pay/wallet-transaction/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page wallet transactions
+      tags:
+      - Pay Wallet
+  /pay/wallet/get:
+    get:
+      parameters:
+      - description: Member user ID
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get or initialize a member wallet
+      tags:
+      - Pay Wallet
+  /pay/wallet/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page member wallets
+      tags:
+      - Pay Wallet
+  /pay/wallet/update-balance:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Balance adjustment in cents
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_pay.WalletBalanceUpdateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Adjust a member wallet balance
+      tags:
+      - Pay Wallet
+  /system/area/get-by-ip:
+    get:
+      description: Returns 内网地址 for loopback/private IPs. Public IP geolocation is
+        intentionally not sent to an external service.
+      parameters:
+      - description: IP address
+        in: query
+        name: ip
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Resolve a local IP description
+      tags:
+      - System Area
+  /system/area/tree:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get the China administrative area tree
+      tags:
+      - System Area
   /system/auth/get-permission-info:
     get:
       description: Returns current admin profile, roles, permissions and menu tree.
@@ -1555,6 +1972,49 @@ paths:
       summary: List current user's latest unread messages
       tags:
       - System Notification
+  /system/permission/assign-user-role:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: User role assignment
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.AssignUserRoleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Assign roles to an operations-console user
+      tags:
+      - System Permission
+  /system/permission/list-user-roles:
+    get:
+      parameters:
+      - description: User ID
+        in: query
+        name: userId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List role IDs assigned to a user
+      tags:
+      - System Permission
   /system/post/simple-list:
     get:
       produces:
@@ -1569,6 +2029,20 @@ paths:
       summary: List enabled posts
       tags:
       - System Organization
+  /system/role/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled roles
+      tags:
+      - System Role
   /system/tenant/get-by-website:
     get:
       description: Returns an enabled tenant matching the request host, or null when
@@ -1659,6 +2133,20 @@ paths:
       summary: Delete operations-console users in batch
       tags:
       - System User
+  /system/user/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export operations-console users
+      tags:
+      - System User
   /system/user/get:
     get:
       produces:
@@ -1673,6 +2161,20 @@ paths:
       summary: Get an operations-console user
       tags:
       - System User
+  /system/user/get-import-template:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Download user import template
+      tags:
+      - System User
   /system/user/get-simple:
     get:
       produces:
@@ -1685,6 +2187,52 @@ paths:
       security:
       - BearerAuth: []
       summary: Get a compact user card
+      tags:
+      - System User
+  /system/user/import:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: XLSX file
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Update existing users
+        in: query
+        name: updateSupport
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Import operations-console users from XLSX
+      tags:
+      - System User
+  /system/user/list:
+    get:
+      parameters:
+      - description: Comma-separated user IDs
+        in: query
+        name: ids
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List operations-console users by IDs
       tags:
       - System User
   /system/user/list-by-nickname:

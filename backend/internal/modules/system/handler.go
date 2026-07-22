@@ -100,7 +100,8 @@ func (h *Handler) PermissionInfo(c *gin.Context) {
 		"roles": []string{"super_admin"},
 		"permissions": []string{
 			"system:user:query", "system:user:create", "system:user:update",
-			"system:user:delete", "system:user:update-password",
+			"system:user:delete", "system:user:update-password", "system:user:import", "system:user:export",
+			"system:permission:assign-user-role",
 			"infra:config:query", "infra:config:create", "infra:config:update", "infra:config:delete", "infra:config:export",
 			"infra:file-config:query", "infra:file-config:create", "infra:file-config:update", "infra:file-config:delete",
 			"infra:api-access-log:query", "infra:api-access-log:export",
@@ -110,7 +111,8 @@ func (h *Handler) PermissionInfo(c *gin.Context) {
 			"member:tag:query", "member:tag:create", "member:tag:update", "member:tag:delete",
 			"pay:app:query", "pay:app:create", "pay:app:update", "pay:app:delete",
 			"pay:channel:query", "pay:channel:create", "pay:channel:update", "pay:channel:delete",
-			"pay:order:query", "pay:refund:query", "pay:refund:create", "pay:refund:delete",
+			"pay:wallet:update-balance", "pay:order:query", "pay:order:export",
+			"pay:refund:query", "pay:refund:create", "pay:refund:delete", "system:tenant:export",
 		},
 		"menus": DefaultMenus(),
 	})

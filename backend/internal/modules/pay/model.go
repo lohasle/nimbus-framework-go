@@ -3,14 +3,17 @@ package pay
 import "time"
 
 type App struct {
-	ID        uint64    `gorm:"primaryKey" json:"id"`
-	TenantID  uint64    `gorm:"index;not null" json:"tenantId"`
-	Name      string    `gorm:"size:128;not null" json:"name"`
-	AppKey    string    `gorm:"size:64;uniqueIndex;not null" json:"appKey"`
-	Status    int       `gorm:"not null;default:0" json:"status"`
-	Remark    string    `gorm:"size:512" json:"remark"`
-	CreatedAt time.Time `json:"createTime"`
-	UpdatedAt time.Time `json:"updateTime"`
+	ID                uint64    `gorm:"primaryKey" json:"id"`
+	TenantID          uint64    `gorm:"index;not null" json:"tenantId"`
+	Name              string    `gorm:"size:128;not null" json:"name"`
+	AppKey            string    `gorm:"size:64;uniqueIndex;not null" json:"appKey"`
+	Status            int       `gorm:"not null;default:0" json:"status"`
+	Remark            string    `gorm:"size:512" json:"remark"`
+	OrderNotifyURL    string    `gorm:"size:1024" json:"orderNotifyUrl"`
+	RefundNotifyURL   string    `gorm:"size:1024" json:"refundNotifyUrl"`
+	TransferNotifyURL string    `gorm:"size:1024" json:"transferNotifyUrl"`
+	CreatedAt         time.Time `json:"createTime"`
+	UpdatedAt         time.Time `json:"updateTime"`
 }
 
 type Channel struct {
@@ -58,12 +61,38 @@ type Refund struct {
 	UpdatedAt        time.Time  `json:"updateTime"`
 }
 
+type Wallet struct {
+	ID            uint64    `gorm:"primaryKey" json:"id"`
+	TenantID      uint64    `gorm:"index;not null" json:"tenantId"`
+	UserID        uint64    `gorm:"uniqueIndex:uk_pay_wallet_user;not null" json:"userId"`
+	UserType      int       `gorm:"uniqueIndex:uk_pay_wallet_user;not null;default:1" json:"userType"`
+	Balance       int64     `gorm:"not null;default:0" json:"balance"`
+	TotalExpense  int64     `gorm:"not null;default:0" json:"totalExpense"`
+	TotalRecharge int64     `gorm:"not null;default:0" json:"totalRecharge"`
+	FreezePrice   int64     `gorm:"not null;default:0" json:"freezePrice"`
+	CreatedAt     time.Time `json:"createTime"`
+	UpdatedAt     time.Time `json:"updateTime"`
+}
+
+type WalletTransaction struct {
+	ID        uint64    `gorm:"primaryKey" json:"id"`
+	TenantID  uint64    `gorm:"index;not null" json:"tenantId"`
+	WalletID  uint64    `gorm:"index;not null" json:"walletId"`
+	Title     string    `gorm:"size:128;not null" json:"title"`
+	Price     int64     `gorm:"not null" json:"price"`
+	Balance   int64     `gorm:"not null" json:"balance"`
+	CreatedAt time.Time `json:"createTime"`
+}
+
 type AppSaveRequest struct {
-	ID     uint64 `json:"id"`
-	Name   string `json:"name" binding:"required"`
-	AppKey string `json:"appKey"`
-	Status int    `json:"status"`
-	Remark string `json:"remark"`
+	ID                uint64 `json:"id"`
+	Name              string `json:"name" binding:"required"`
+	AppKey            string `json:"appKey"`
+	Status            int    `json:"status"`
+	Remark            string `json:"remark"`
+	OrderNotifyURL    string `json:"orderNotifyUrl"`
+	RefundNotifyURL   string `json:"refundNotifyUrl"`
+	TransferNotifyURL string `json:"transferNotifyUrl"`
 }
 
 type ChannelSaveRequest struct {
@@ -92,7 +121,9 @@ type RefundCreateRequest struct {
 	Reason           string `json:"reason"`
 }
 
-func (App) TableName() string     { return "pay_app" }
-func (Channel) TableName() string { return "pay_channel" }
-func (Order) TableName() string   { return "pay_order" }
-func (Refund) TableName() string  { return "pay_refund" }
+func (App) TableName() string               { return "pay_app" }
+func (Channel) TableName() string           { return "pay_channel" }
+func (Order) TableName() string             { return "pay_order" }
+func (Refund) TableName() string            { return "pay_refund" }
+func (Wallet) TableName() string            { return "pay_wallet" }
+func (WalletTransaction) TableName() string { return "pay_wallet_transaction" }
