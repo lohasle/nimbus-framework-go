@@ -1,9 +1,11 @@
 package system
 
 import (
+	"encoding/json"
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/lohasle/nimbus-framework-go/internal/platform/httpx"
@@ -69,6 +71,32 @@ func (h *Handler) Login(c *gin.Context) {
 	}
 	token, err := h.service.Login(tenantID, req)
 	if err != nil {
+		h.service.db.Create(&LoginLog{TenantID: tenantID, LogType: 100, TraceID: c.GetString("trace_id"), Username: req.Username, Result: 1, Status: 1, UserIP: c.ClientIP(), UserAgent: c.Request.UserAgent()})
+		httpx.Fail(c, http.StatusUnauthorized, 401, err.Error())
+		return
+	}
+	h.service.db.Model(&AdminUser{}).Where("id = ?", token.UserID).Updates(map[string]any{"login_ip": c.ClientIP(), "login_date": time.Now()})
+	h.service.db.Create(&LoginLog{TenantID: tenantID, LogType: 100, TraceID: c.GetString("trace_id"), UserID: token.UserID, UserType: 2, Username: req.Username, Result: 0, Status: 0, UserIP: c.ClientIP(), UserAgent: c.Request.UserAgent()})
+	httpx.OK(c, token)
+}
+
+// RefreshToken godoc
+// @Summary Refresh admin tokens
+// @Description Validates and rotates a refresh token, returning a new access/refresh token pair.
+// @Tags System Auth
+// @Produce json
+// @Param refreshToken query string true "Refresh token"
+// @Success 200 {object} httpx.Response
+// @Failure 401 {object} httpx.Response
+// @Router /system/auth/refresh-token [post]
+func (h *Handler) RefreshToken(c *gin.Context) {
+	raw := strings.TrimSpace(c.Query("refreshToken"))
+	if raw == "" {
+		httpx.Fail(c, http.StatusUnauthorized, 401, "无效的刷新令牌")
+		return
+	}
+	token, err := h.service.RefreshToken(raw)
+	if err != nil {
 		httpx.Fail(c, http.StatusUnauthorized, 401, err.Error())
 		return
 	}
@@ -95,27 +123,119 @@ func (h *Handler) PermissionInfo(c *gin.Context) {
 		httpx.Fail(c, http.StatusUnauthorized, 401, "用户不存在")
 		return
 	}
+	roles, permissions, menus := h.permissionData(user)
 	httpx.OK(c, gin.H{
-		"user":  gin.H{"id": user.ID, "username": user.Username, "nickname": user.Nickname, "avatar": "", "deptId": user.DeptID, "email": user.Email},
-		"roles": []string{"super_admin"},
-		"permissions": []string{
-			"system:user:query", "system:user:create", "system:user:update",
-			"system:user:delete", "system:user:update-password", "system:user:import", "system:user:export",
-			"system:permission:assign-user-role",
-			"infra:config:query", "infra:config:create", "infra:config:update", "infra:config:delete", "infra:config:export",
-			"infra:file-config:query", "infra:file-config:create", "infra:file-config:update", "infra:file-config:delete",
-			"infra:api-access-log:query", "infra:api-access-log:export",
-			"member:user:query", "member:user:update", "member:user:update-level", "member:user:update-point",
-			"member:level:query", "member:level:create", "member:level:update", "member:level:delete",
-			"member:group:query", "member:group:create", "member:group:update", "member:group:delete",
-			"member:tag:query", "member:tag:create", "member:tag:update", "member:tag:delete",
-			"pay:app:query", "pay:app:create", "pay:app:update", "pay:app:delete",
-			"pay:channel:query", "pay:channel:create", "pay:channel:update", "pay:channel:delete",
-			"pay:wallet:update-balance", "pay:order:query", "pay:order:export",
-			"pay:refund:query", "pay:refund:create", "pay:refund:delete", "system:tenant:export",
-		},
-		"menus": DefaultMenus(),
+		"user":        gin.H{"id": user.ID, "username": user.Username, "nickname": user.Nickname, "avatar": user.Avatar, "deptId": user.DeptID, "email": user.Email},
+		"roles":       roles,
+		"permissions": permissions,
+		"menus":       menus,
 	})
+}
+
+func (h *Handler) permissionData(user AdminUser) ([]string, []string, []Menu) {
+	var roles []Role
+	h.service.db.Table("roles").Joins("JOIN user_roles ON user_roles.role_id = roles.id").
+		Where("user_roles.user_id = ? AND roles.status = 0", user.ID).Order("roles.sort,roles.id").Find(&roles)
+	roleCodes := make([]string, 0, len(roles))
+	roleIDs := make([]uint64, 0, len(roles))
+	superAdmin := false
+	for _, role := range roles {
+		roleCodes = append(roleCodes, role.Code)
+		roleIDs = append(roleIDs, role.ID)
+		if role.Code == "super_admin" {
+			superAdmin = true
+		}
+	}
+	query := h.service.db.Where("status = 0")
+	allowedIDs := h.allowedMenuIDs(user.TenantID)
+	if len(allowedIDs) > 0 {
+		query = query.Where("id IN ?", allowedIDs)
+	}
+	if !superAdmin {
+		var menuIDs []uint64
+		h.service.db.Model(&RoleMenu{}).Where("role_id IN ?", roleIDs).Pluck("menu_id", &menuIDs)
+		menuIDs = h.withMenuAncestors(menuIDs)
+		query = query.Where("id IN ?", menuIDs)
+	}
+	var rows []SystemMenu
+	query.Order("sort,id").Find(&rows)
+	permissions := make([]string, 0)
+	for _, row := range rows {
+		if row.Permission != "" {
+			permissions = append(permissions, row.Permission)
+		}
+	}
+	return roleCodes, permissions, buildMenuTree(rows)
+}
+
+func (h *Handler) allowedMenuIDs(tenantID uint64) []uint64 {
+	var tenant Tenant
+	if h.service.db.First(&tenant, tenantID).Error != nil || tenant.PackageID == 0 {
+		return nil
+	}
+	var pack TenantPackage
+	if h.service.db.First(&pack, tenant.PackageID).Error != nil {
+		return nil
+	}
+	var ids []uint64
+	if json.Unmarshal([]byte(pack.MenuIDs), &ids) != nil {
+		return nil
+	}
+	if len(ids) == 0 {
+		return []uint64{0}
+	}
+	var buttonIDs []uint64
+	h.service.db.Model(&SystemMenu{}).Where("type = 3 AND parent_id IN ?", ids).Pluck("id", &buttonIDs)
+	return uniqueIDs(append(ids, buttonIDs...))
+}
+
+func (h *Handler) withMenuAncestors(ids []uint64) []uint64 {
+	result := uniqueIDs(ids)
+	seen := make(map[uint64]struct{}, len(result))
+	for _, id := range result {
+		seen[id] = struct{}{}
+	}
+	current := append([]uint64{}, result...)
+	for len(current) > 0 {
+		var parents []uint64
+		h.service.db.Model(&SystemMenu{}).Where("id IN ? AND parent_id > 0", current).Pluck("parent_id", &parents)
+		current = current[:0]
+		for _, parent := range parents {
+			if _, ok := seen[parent]; !ok {
+				seen[parent] = struct{}{}
+				result = append(result, parent)
+				current = append(current, parent)
+			}
+		}
+	}
+	return result
+}
+
+func buildMenuTree(rows []SystemMenu) []Menu {
+	byParent := make(map[uint64][]SystemMenu)
+	for _, row := range rows {
+		if row.Type == 1 || row.Type == 2 {
+			byParent[row.ParentID] = append(byParent[row.ParentID], row)
+		}
+	}
+	var build func(uint64) []Menu
+	build = func(parentID uint64) []Menu {
+		result := make([]Menu, 0, len(byParent[parentID]))
+		for _, row := range byParent[parentID] {
+			var component, componentName *string
+			if row.Component != "" {
+				value := row.Component
+				component = &value
+			}
+			if row.ComponentName != "" {
+				value := row.ComponentName
+				componentName = &value
+			}
+			result = append(result, Menu{ID: row.ID, ParentID: row.ParentID, Name: row.Name, Path: row.Path, Component: component, ComponentName: componentName, Icon: row.Icon, Visible: row.Visible, KeepAlive: row.KeepAlive, AlwaysShow: row.AlwaysShow, Children: build(row.ID)})
+		}
+		return result
+	}
+	return build(0)
 }
 
 // SimpleDictData godoc

@@ -321,7 +321,7 @@ func (h *Handler) AccessLogPage(c *gin.Context) {
 		}
 		views = append(views, gin.H{
 			"id": row.ID, "traceId": row.TraceID, "userId": row.UserID, "userType": 2,
-			"applicationName": "nimbus-server", "requestMethod": row.Method, "requestUrl": row.Path,
+			"applicationName": "nimbus-admin-api", "requestMethod": row.Method, "requestUrl": row.Path,
 			"requestParams": "", "responseBody": "", "userIp": row.IP, "userAgent": row.UserAgent,
 			"operateModule": "", "operateName": "", "operateType": 0,
 			"beginTime": row.CreatedAt, "endTime": row.CreatedAt.Add(time.Duration(row.Duration) * time.Millisecond),
@@ -339,7 +339,7 @@ func (h *Handler) accessLogQuery(c *gin.Context) *gorm.DB {
 	if requestURL := strings.TrimSpace(c.Query("requestUrl")); requestURL != "" {
 		query = query.Where("path LIKE ?", "%"+requestURL+"%")
 	}
-	if application := strings.TrimSpace(c.Query("applicationName")); application != "" && !strings.Contains(strings.ToLower("nimbus-server"), strings.ToLower(application)) {
+	if application := strings.TrimSpace(c.Query("applicationName")); application != "" && !strings.Contains(strings.ToLower("nimbus-admin-api"), strings.ToLower(application)) {
 		query = query.Where("1 = 0")
 	}
 	if duration := strings.TrimSpace(c.Query("duration")); duration != "" {

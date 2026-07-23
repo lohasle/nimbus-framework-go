@@ -33,6 +33,25 @@ definitions:
     - key
     - name
     type: object
+  internal_modules_infra.DataSourceConfig:
+    properties:
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
+      url:
+        type: string
+      username:
+        type: string
+    type: object
   internal_modules_infra.FileConfigSaveRequest:
     properties:
       config:
@@ -49,6 +68,48 @@ definitions:
         type: integer
     required:
     - name
+    type: object
+  internal_modules_infra.FileCreateRequest:
+    properties:
+      configId:
+        type: integer
+      name:
+        type: string
+      path:
+        type: string
+      size:
+        type: integer
+      type:
+        type: string
+      url:
+        type: string
+    type: object
+  internal_modules_infra.Job:
+    properties:
+      createTime:
+        type: string
+      cronExpression:
+        type: string
+      handlerName:
+        type: string
+      handlerParam:
+        type: string
+      id:
+        type: integer
+      monitorTimeout:
+        type: integer
+      name:
+        type: string
+      retryCount:
+        type: integer
+      retryInterval:
+        type: integer
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
     type: object
   internal_modules_member.GroupSaveRequest:
     properties:
@@ -230,6 +291,31 @@ definitions:
     - balance
     - userId
     type: object
+  internal_modules_system.AssignRoleDataScopeRequest:
+    properties:
+      dataScope:
+        type: integer
+      dataScopeDeptIds:
+        items:
+          type: integer
+        type: array
+      roleId:
+        type: integer
+    required:
+    - dataScope
+    - roleId
+    type: object
+  internal_modules_system.AssignRoleMenuRequest:
+    properties:
+      menuIds:
+        items:
+          type: integer
+        type: array
+      roleId:
+        type: integer
+    required:
+    - roleId
+    type: object
   internal_modules_system.AssignUserRoleRequest:
     properties:
       roleIds:
@@ -240,6 +326,73 @@ definitions:
         type: integer
     required:
     - userId
+    type: object
+  internal_modules_system.Department:
+    properties:
+      createTime:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      leaderUserId:
+        type: integer
+      name:
+        type: string
+      parentId:
+        type: integer
+      phone:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
+    type: object
+  internal_modules_system.DictData:
+    properties:
+      colorType:
+        type: string
+      createTime:
+        type: string
+      cssClass:
+        type: string
+      dictType:
+        type: string
+      id:
+        type: integer
+      label:
+        type: string
+      remark:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+      updateTime:
+        type: string
+      value:
+        type: string
+    type: object
+  internal_modules_system.DictType:
+    properties:
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      status:
+        type: integer
+      type:
+        type: string
+      updateTime:
+        type: string
     type: object
   internal_modules_system.LoginRequest:
     properties:
@@ -252,6 +405,394 @@ definitions:
     required:
     - password
     - username
+    type: object
+  internal_modules_system.MailAccount:
+    properties:
+      createTime:
+        type: string
+      host:
+        type: string
+      id:
+        type: integer
+      mail:
+        type: string
+      password:
+        type: string
+      port:
+        type: integer
+      sslEnable:
+        type: boolean
+      starttlsEnable:
+        type: boolean
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
+      username:
+        type: string
+    type: object
+  internal_modules_system.MailSendRequest:
+    properties:
+      bccMails:
+        items:
+          type: string
+        type: array
+      ccMails:
+        items:
+          type: string
+        type: array
+      templateCode:
+        type: string
+      templateParams:
+        additionalProperties: {}
+        type: object
+      toMails:
+        items:
+          type: string
+        type: array
+    required:
+    - templateCode
+    - toMails
+    type: object
+  internal_modules_system.MailTemplate:
+    properties:
+      accountId:
+        type: integer
+      code:
+        type: string
+      content:
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      nickname:
+        type: string
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      title:
+        type: string
+      updateTime:
+        type: string
+    type: object
+  internal_modules_system.Notice:
+    properties:
+      content:
+        type: string
+      createTime:
+        type: string
+      creator:
+        type: string
+      id:
+        type: integer
+      pushedAt:
+        type: string
+      remark:
+        type: string
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      title:
+        type: string
+      type:
+        type: integer
+      updateTime:
+        type: string
+    type: object
+  internal_modules_system.NotifySendRequest:
+    properties:
+      templateCode:
+        type: string
+      templateParams:
+        additionalProperties: {}
+        type: object
+      userId:
+        type: integer
+    required:
+    - templateCode
+    - userId
+    type: object
+  internal_modules_system.NotifyTemplate:
+    properties:
+      code:
+        type: string
+      content:
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      nickname:
+        type: string
+      params:
+        type: string
+      remark:
+        type: string
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      type:
+        type: integer
+      updateTime:
+        type: string
+    type: object
+  internal_modules_system.OAuth2ClientSaveRequest:
+    properties:
+      accessTokenValiditySeconds:
+        type: integer
+      additionalInformation:
+        type: string
+      authorities:
+        items:
+          type: string
+        type: array
+      authorizedGrantTypes:
+        items:
+          type: string
+        type: array
+      autoApprove:
+        type: boolean
+      clientId:
+        type: string
+      description:
+        type: string
+      id:
+        type: integer
+      logo:
+        type: string
+      name:
+        type: string
+      redirectUris:
+        items:
+          type: string
+        type: array
+      refreshTokenValiditySeconds:
+        type: integer
+      resourceIds:
+        items:
+          type: string
+        type: array
+      scopes:
+        items:
+          type: string
+        type: array
+      secret:
+        type: string
+      status:
+        type: integer
+    required:
+    - clientId
+    - name
+    - secret
+    type: object
+  internal_modules_system.Post:
+    properties:
+      code:
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
+    type: object
+  internal_modules_system.RoleSaveRequest:
+    properties:
+      code:
+        type: string
+      dataScope:
+        type: integer
+      dataScopeDeptIds:
+        items:
+          type: integer
+        type: array
+      id:
+        type: integer
+      name:
+        type: string
+      remark:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+    required:
+    - code
+    - name
+    type: object
+  internal_modules_system.SMSChannel:
+    properties:
+      apiKey:
+        type: string
+      apiSecret:
+        type: string
+      callbackUrl:
+        type: string
+      code:
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      remark:
+        type: string
+      signature:
+        type: string
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
+    type: object
+  internal_modules_system.SMSSendRequest:
+    properties:
+      mobile:
+        type: string
+      templateCode:
+        type: string
+      templateParams:
+        additionalProperties: {}
+        type: object
+    required:
+    - mobile
+    - templateCode
+    type: object
+  internal_modules_system.SMSTemplateRequest:
+    properties:
+      apiTemplateId:
+        type: string
+      channelId:
+        type: integer
+      code:
+        type: string
+      content:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      params:
+        items:
+          type: string
+        type: array
+      remark:
+        type: string
+      status:
+        type: integer
+      type:
+        type: integer
+    type: object
+  internal_modules_system.SocialClient:
+    properties:
+      agentId:
+        type: string
+      clientId:
+        type: string
+      clientSecret:
+        type: string
+      createTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      publicKey:
+        type: string
+      socialType:
+        type: integer
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      updateTime:
+        type: string
+      userType:
+        type: integer
+    type: object
+  internal_modules_system.SystemMenu:
+    properties:
+      alwaysShow:
+        type: boolean
+      component:
+        type: string
+      componentName:
+        type: string
+      createTime:
+        type: string
+      icon:
+        type: string
+      id:
+        type: integer
+      keepAlive:
+        type: boolean
+      name:
+        type: string
+      parentId:
+        type: integer
+      path:
+        type: string
+      permission:
+        type: string
+      sort:
+        type: integer
+      status:
+        type: integer
+      tenantId:
+        type: integer
+      type:
+        type: integer
+      updateTime:
+        type: string
+      visible:
+        type: boolean
+    type: object
+  internal_modules_system.TenantSaveRequest:
+    properties:
+      accountCount:
+        type: integer
+      contactMobile:
+        type: string
+      contactName:
+        type: string
+      domain:
+        type: string
+      expireTime:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      status:
+        type: integer
+      username:
+        type: string
+      websites:
+        items:
+          type: string
+        type: array
+    required:
+    - name
     type: object
   internal_modules_system.UserSaveRequest:
     properties:
@@ -285,6 +826,32 @@ definitions:
         type: string
     required:
     - nickname
+    type: object
+  internal_modules_system.authSMSSendRequest:
+    properties:
+      mobile:
+        type: string
+      scene:
+        type: integer
+    required:
+    - mobile
+    - scene
+    type: object
+  internal_modules_system.registerRequest:
+    properties:
+      mobile:
+        type: string
+      nickname:
+        type: string
+      password:
+        type: string
+      tenantName:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
     type: object
 info:
   contact: {}
@@ -371,6 +938,48 @@ paths:
       security:
       - BearerAuth: []
       summary: Page API access logs
+      tags:
+      - Infra Logging
+  /infra/api-error-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export API error logs
+      tags:
+      - Infra Logging
+  /infra/api-error-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page API error logs
+      tags:
+      - Infra Logging
+  /infra/api-error-log/update-status:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update API error processing status
       tags:
       - Infra Logging
   /infra/config/create:
@@ -507,6 +1116,108 @@ paths:
       summary: Update a system parameter
       tags:
       - Infra Config
+  /infra/data-source-config/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data source
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.DataSourceConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create and verify a MySQL data source
+      tags:
+      - Infra Data Source
+  /infra/data-source-config/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a data source
+      tags:
+      - Infra Data Source
+  /infra/data-source-config/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete data sources in batch
+      tags:
+      - Infra Data Source
+  /infra/data-source-config/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a data source configuration
+      tags:
+      - Infra Data Source
+  /infra/data-source-config/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List data source configurations
+      tags:
+      - Infra Data Source
+  /infra/data-source-config/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Data source
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.DataSourceConfig'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update and verify a MySQL data source
+      tags:
+      - Infra Data Source
   /infra/file-config/create:
     post:
       consumes:
@@ -637,6 +1348,123 @@ paths:
       summary: Set the primary file storage configuration
       tags:
       - Infra File
+  /infra/file/content/{id}:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      summary: Download uploaded file content
+      tags:
+      - Infra File
+  /infra/file/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: File metadata
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.FileCreateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Register a file uploaded through a presigned URL
+      tags:
+      - Infra File
+  /infra/file/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a file and its stored content
+      tags:
+      - Infra File
+  /infra/file/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete files in batch
+      tags:
+      - Infra File
+  /infra/file/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page uploaded files
+      tags:
+      - Infra File
+  /infra/file/presigned-url:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a local-storage upload URL and final file path
+      tags:
+      - Infra File
+  /infra/file/upload:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: File
+        in: formData
+        name: file
+        required: true
+        type: file
+      - description: Original path
+        in: formData
+        name: path
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Upload a file to the primary storage
+      tags:
+      - Infra File
   /infra/health:
     get:
       description: Health endpoint used by deployment probes and scaffold modules.
@@ -650,6 +1478,236 @@ paths:
       summary: Service health
       tags:
       - Health
+  /infra/job-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export scheduled job logs
+      tags:
+      - Infra Job
+  /infra/job-log/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a scheduled job execution log
+      tags:
+      - Infra Job
+  /infra/job-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page scheduled job execution logs
+      tags:
+      - Infra Job
+  /infra/job/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Job
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.Job'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a scheduled job
+      tags:
+      - Infra Job
+  /infra/job/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a scheduled job
+      tags:
+      - Infra Job
+  /infra/job/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete scheduled jobs in batch
+      tags:
+      - Infra Job
+  /infra/job/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export scheduled jobs
+      tags:
+      - Infra Job
+  /infra/job/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a scheduled job
+      tags:
+      - Infra Job
+  /infra/job/get_next_times:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get the next ten execution times
+      tags:
+      - Infra Job
+  /infra/job/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page scheduled jobs
+      tags:
+      - Infra Job
+  /infra/job/sync:
+    post:
+      description: The scheduler reads the database dynamically; this endpoint validates
+        all enabled CRON expressions.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Synchronize enabled jobs with the in-process scheduler
+      tags:
+      - Infra Job
+  /infra/job/trigger:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Trigger a scheduled job immediately
+      tags:
+      - Infra Job
+  /infra/job/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Job
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_infra.Job'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a scheduled job
+      tags:
+      - Infra Job
+  /infra/job/update-status:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update scheduled job status
+      tags:
+      - Infra Job
+  /infra/redis/get-monitor-info:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get live Redis monitor information
+      tags:
+      - Infra Redis
   /member/address/list:
     get:
       produces:
@@ -1902,6 +2960,238 @@ paths:
       summary: Admin logout
       tags:
       - System Auth
+  /system/auth/refresh-token:
+    post:
+      description: Validates and rotates a refresh token, returning a new access/refresh
+        token pair.
+      parameters:
+      - description: Refresh token
+        in: query
+        name: refreshToken
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Refresh admin tokens
+      tags:
+      - System Auth
+  /system/auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a tenant admin account without roles. An administrator
+        assigns roles after registration.
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        type: integer
+      - description: Registration
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.registerRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Register an operations-console user
+      tags:
+      - System Auth
+  /system/auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Reset an operations-console password with an SMS code
+      tags:
+      - System Auth
+  /system/auth/send-sms-code:
+    post:
+      consumes:
+      - application/json
+      description: Generates a five-minute one-time code and dispatches it through
+        the configured SMS adapter when present.
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        required: true
+        type: integer
+      - description: SMS code request
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.authSMSSendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Send an authentication SMS code
+      tags:
+      - System Auth
+  /system/auth/sms-login:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Log in with an SMS verification code
+      tags:
+      - System Auth
+  /system/auth/social-auth-redirect:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Build a social provider authorization redirect
+      tags:
+      - System Social
+  /system/auth/social-login:
+    post:
+      consumes:
+      - application/json
+      description: Provider code exchange is delegated to the configured social adapter;
+        the resulting social record must already be bound to an admin user.
+      parameters:
+      - description: Tenant ID
+        in: header
+        name: tenant-id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Log in with a previously bound social account
+      tags:
+      - System Auth
+  /system/dept/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.Department'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a department
+      tags:
+      - System Organization
+  /system/dept/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a department
+      tags:
+      - System Organization
+  /system/dept/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete departments in batch
+      tags:
+      - System Organization
+  /system/dept/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a department
+      tags:
+      - System Organization
+  /system/dept/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List departments
+      tags:
+      - System Organization
   /system/dept/simple-list:
     get:
       produces:
@@ -1916,6 +3206,122 @@ paths:
       summary: List enabled departments
       tags:
       - System Organization
+  /system/dept/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Department
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.Department'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a department
+      tags:
+      - System Organization
+  /system/dict-data/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.DictData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create dictionary data
+      tags:
+      - System Dictionary
+  /system/dict-data/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete dictionary data
+      tags:
+      - System Dictionary
+  /system/dict-data/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete dictionary data in batch
+      tags:
+      - System Dictionary
+  /system/dict-data/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export dictionary data
+      tags:
+      - System Dictionary
+  /system/dict-data/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get dictionary data
+      tags:
+      - System Dictionary
+  /system/dict-data/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page dictionary data
+      tags:
+      - System Dictionary
   /system/dict-data/simple-list:
     get:
       description: Returns enabled dictionary entries required by the operations console.
@@ -1931,6 +3337,173 @@ paths:
       summary: Frontend dictionary bootstrap
       tags:
       - System Bootstrap
+  /system/dict-data/type:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List dictionary data by type
+      tags:
+      - System Dictionary
+  /system/dict-data/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.DictData'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update dictionary data
+      tags:
+      - System Dictionary
+  /system/dict-type/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary type
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.DictType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a dictionary type
+      tags:
+      - System Dictionary
+  /system/dict-type/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a dictionary type
+      tags:
+      - System Dictionary
+  /system/dict-type/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete dictionary types in batch
+      tags:
+      - System Dictionary
+  /system/dict-type/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export dictionary types
+      tags:
+      - System Dictionary
+  /system/dict-type/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a dictionary type
+      tags:
+      - System Dictionary
+  /system/dict-type/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page dictionary types
+      tags:
+      - System Dictionary
+  /system/dict-type/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled dictionary types
+      tags:
+      - System Dictionary
+  /system/dict-type/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Dictionary type
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.DictType'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a dictionary type
+      tags:
+      - System Dictionary
   /system/health:
     get:
       description: Health endpoint used by deployment probes and scaffold modules.
@@ -1944,6 +3517,549 @@ paths:
       summary: Service health
       tags:
       - Health
+  /system/login-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export login logs
+      tags:
+      - System Audit
+  /system/login-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page login logs
+      tags:
+      - System Audit
+  /system/mail-account/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Mail account
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.MailAccount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a mail account
+      tags:
+      - System Mail
+  /system/mail-account/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a mail account
+      tags:
+      - System Mail
+  /system/mail-account/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete mail accounts in batch
+      tags:
+      - System Mail
+  /system/mail-account/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a mail account
+      tags:
+      - System Mail
+  /system/mail-account/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page mail accounts
+      tags:
+      - System Mail
+  /system/mail-account/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List mail accounts
+      tags:
+      - System Mail
+  /system/mail-account/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Mail account
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.MailAccount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a mail account
+      tags:
+      - System Mail
+  /system/mail-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export mail logs
+      tags:
+      - System Mail
+  /system/mail-log/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a mail log
+      tags:
+      - System Mail
+  /system/mail-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page mail logs
+      tags:
+      - System Mail
+  /system/mail-template/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Mail template
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.MailTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a mail template
+      tags:
+      - System Mail
+  /system/mail-template/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a mail template
+      tags:
+      - System Mail
+  /system/mail-template/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete mail templates in batch
+      tags:
+      - System Mail
+  /system/mail-template/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a mail template
+      tags:
+      - System Mail
+  /system/mail-template/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page mail templates
+      tags:
+      - System Mail
+  /system/mail-template/send-mail:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Mail
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.MailSendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Send an email from a template
+      tags:
+      - System Mail
+  /system/mail-template/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled mail templates
+      tags:
+      - System Mail
+  /system/mail-template/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Mail template
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.MailTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a mail template
+      tags:
+      - System Mail
+  /system/menu/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Menu
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SystemMenu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a menu
+      tags:
+      - System Menu
+  /system/menu/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a menu
+      tags:
+      - System Menu
+  /system/menu/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a menu
+      tags:
+      - System Menu
+  /system/menu/list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List menus
+      tags:
+      - System Menu
+  /system/menu/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List all menus for permission assignment
+      tags:
+      - System Menu
+  /system/menu/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Menu
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SystemMenu'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a menu
+      tags:
+      - System Menu
+  /system/notice/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Notice
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.Notice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a notice
+      tags:
+      - System Notice
+  /system/notice/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a notice
+      tags:
+      - System Notice
+  /system/notice/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete notices in batch
+      tags:
+      - System Notice
+  /system/notice/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a notice
+      tags:
+      - System Notice
+  /system/notice/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page notices
+      tags:
+      - System Notice
+  /system/notice/push:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Push a notice to enabled tenant users
+      tags:
+      - System Notice
+  /system/notice/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Notice
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.Notice'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a notice
+      tags:
+      - System Notice
   /system/notify-message/get-unread-count:
     get:
       produces:
@@ -1972,6 +4088,477 @@ paths:
       summary: List current user's latest unread messages
       tags:
       - System Notification
+  /system/notify-message/my-page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page current user's notification messages
+      tags:
+      - System Notification
+  /system/notify-message/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page all notification messages
+      tags:
+      - System Notification
+  /system/notify-message/update-all-read:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Mark all current user's notification messages read
+      tags:
+      - System Notification
+  /system/notify-message/update-read:
+    put:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Mark selected notification messages read
+      tags:
+      - System Notification
+  /system/notify-template/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Notification template
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.NotifyTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a notification template
+      tags:
+      - System Notification
+  /system/notify-template/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a notification template
+      tags:
+      - System Notification
+  /system/notify-template/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete notification templates in batch
+      tags:
+      - System Notification
+  /system/notify-template/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a notification template
+      tags:
+      - System Notification
+  /system/notify-template/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page notification templates
+      tags:
+      - System Notification
+  /system/notify-template/send-notify:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Notification
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.NotifySendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Send a notification from a template
+      tags:
+      - System Notification
+  /system/notify-template/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled notification templates
+      tags:
+      - System Notification
+  /system/notify-template/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Notification template
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.NotifyTemplate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a notification template
+      tags:
+      - System Notification
+  /system/oauth2-client/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: OAuth2 client
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.OAuth2ClientSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create an OAuth2 client
+      tags:
+      - System OAuth2
+  /system/oauth2-client/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an OAuth2 client
+      tags:
+      - System OAuth2
+  /system/oauth2-client/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete OAuth2 clients in batch
+      tags:
+      - System OAuth2
+  /system/oauth2-client/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get an OAuth2 client
+      tags:
+      - System OAuth2
+  /system/oauth2-client/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page OAuth2 clients
+      tags:
+      - System OAuth2
+  /system/oauth2-client/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: OAuth2 client
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.OAuth2ClientSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an OAuth2 client
+      tags:
+      - System OAuth2
+  /system/oauth2-token/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Revoke an OAuth2 access token
+      tags:
+      - System OAuth2
+  /system/oauth2-token/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page valid OAuth2 access tokens
+      tags:
+      - System OAuth2
+  /system/oauth2/authorize:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get OAuth2 authorization information
+      tags:
+      - System OAuth2 Open
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Approve OAuth2 scopes and issue an authorization result
+      tags:
+      - System OAuth2 Open
+  /system/oauth2/check-token:
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Introspect an OAuth2 token
+      tags:
+      - System OAuth2 Open
+  /system/oauth2/token:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Revoke an OAuth2 token
+      tags:
+      - System OAuth2 Open
+    post:
+      consumes:
+      - application/x-www-form-urlencoded
+      description: Supports authorization_code, password, client_credentials and refresh_token
+        grants using HTTP Basic client authentication.
+      parameters:
+      - description: Grant type
+        in: formData
+        name: grant_type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      summary: Issue an OAuth2 access token
+      tags:
+      - System OAuth2 Open
+  /system/operate-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export operation logs
+      tags:
+      - System Audit
+  /system/operate-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page operation logs
+      tags:
+      - System Audit
+  /system/permission/assign-role-data-scope:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role data scope
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.AssignRoleDataScopeRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Assign data scope to a role
+      tags:
+      - System Permission
+  /system/permission/assign-role-menu:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role menu assignment
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.AssignRoleMenuRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Assign menus to a role
+      tags:
+      - System Permission
   /system/permission/assign-user-role:
     post:
       consumes:
@@ -1995,6 +4582,26 @@ paths:
       summary: Assign roles to an operations-console user
       tags:
       - System Permission
+  /system/permission/list-role-menus:
+    get:
+      parameters:
+      - description: Role ID
+        in: query
+        name: roleId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List menu IDs assigned to a role
+      tags:
+      - System Permission
   /system/permission/list-user-roles:
     get:
       parameters:
@@ -2015,6 +4622,99 @@ paths:
       summary: List role IDs assigned to a user
       tags:
       - System Permission
+  /system/post/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Post
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.Post'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a post
+      tags:
+      - System Organization
+  /system/post/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a post
+      tags:
+      - System Organization
+  /system/post/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete posts in batch
+      tags:
+      - System Organization
+  /system/post/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export posts
+      tags:
+      - System Organization
+  /system/post/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a post
+      tags:
+      - System Organization
+  /system/post/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page posts
+      tags:
+      - System Organization
   /system/post/simple-list:
     get:
       produces:
@@ -2029,6 +4729,122 @@ paths:
       summary: List enabled posts
       tags:
       - System Organization
+  /system/post/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Post
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.Post'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a post
+      tags:
+      - System Organization
+  /system/role/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.RoleSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a role
+      tags:
+      - System Role
+  /system/role/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a role
+      tags:
+      - System Role
+  /system/role/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete roles in batch
+      tags:
+      - System Role
+  /system/role/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export roles
+      tags:
+      - System Role
+  /system/role/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a role
+      tags:
+      - System Role
+  /system/role/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page roles
+      tags:
+      - System Role
   /system/role/simple-list:
     get:
       produces:
@@ -2043,6 +4859,569 @@ paths:
       summary: List enabled roles
       tags:
       - System Role
+  /system/role/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Role
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.RoleSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a role
+      tags:
+      - System Role
+  /system/sms-channel/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: SMS channel
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SMSChannel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create an SMS channel
+      tags:
+      - System SMS
+  /system/sms-channel/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an SMS channel
+      tags:
+      - System SMS
+  /system/sms-channel/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete SMS channels in batch
+      tags:
+      - System SMS
+  /system/sms-channel/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get an SMS channel
+      tags:
+      - System SMS
+  /system/sms-channel/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page SMS channels
+      tags:
+      - System SMS
+  /system/sms-channel/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled SMS channels
+      tags:
+      - System SMS
+  /system/sms-channel/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: SMS channel
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SMSChannel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an SMS channel
+      tags:
+      - System SMS
+  /system/sms-log/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export SMS logs
+      tags:
+      - System SMS
+  /system/sms-log/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page SMS logs
+      tags:
+      - System SMS
+  /system/sms-template/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: SMS template
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SMSTemplateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create an SMS template
+      tags:
+      - System SMS
+  /system/sms-template/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete an SMS template
+      tags:
+      - System SMS
+  /system/sms-template/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete SMS templates in batch
+      tags:
+      - System SMS
+  /system/sms-template/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export SMS templates
+      tags:
+      - System SMS
+  /system/sms-template/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get an SMS template
+      tags:
+      - System SMS
+  /system/sms-template/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page SMS templates
+      tags:
+      - System SMS
+  /system/sms-template/send-sms:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: SMS
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SMSSendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Send an SMS from a template
+      tags:
+      - System SMS
+  /system/sms-template/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled SMS templates
+      tags:
+      - System SMS
+  /system/sms-template/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: SMS template
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SMSTemplateRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update an SMS template
+      tags:
+      - System SMS
+  /system/social-client/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Social client
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SocialClient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a social login client
+      tags:
+      - System Social
+  /system/social-client/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a social login client
+      tags:
+      - System Social
+  /system/social-client/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a social login client
+      tags:
+      - System Social
+  /system/social-client/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page social login clients
+      tags:
+      - System Social
+  /system/social-client/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Social client
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.SocialClient'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a social login client
+      tags:
+      - System Social
+  /system/social-user/bind:
+    post:
+      consumes:
+      - application/json
+      description: Stores a provider authorization result. Provider token exchange
+        is expected to be completed by an integration adapter.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Bind a social authorization result to current user
+      tags:
+      - System Social
+  /system/social-user/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a social user
+      tags:
+      - System Social
+  /system/social-user/get-bind-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List current user's bound social accounts
+      tags:
+      - System Social
+  /system/social-user/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page social users
+      tags:
+      - System Social
+  /system/social-user/unbind:
+    delete:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Unbind a social account from current user
+      tags:
+      - System Social
+  /system/tenant/create:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tenant
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.TenantSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Create a tenant and its initial administrator
+      tags:
+      - System Tenant
+  /system/tenant/delete:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete a tenant and tenant-owned system data
+      tags:
+      - System Tenant
+  /system/tenant/delete-list:
+    delete:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Delete tenants in batch
+      tags:
+      - System Tenant
+  /system/tenant/export-excel:
+    get:
+      produces:
+      - application/octet-stream
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: file
+      security:
+      - BearerAuth: []
+      summary: Export tenants
+      tags:
+      - System Tenant
+  /system/tenant/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get a tenant
+      tags:
+      - System Tenant
   /system/tenant/get-by-website:
     get:
       description: Returns an enabled tenant matching the request host, or null when
@@ -2082,6 +5461,57 @@ paths:
       summary: Resolve tenant ID
       tags:
       - System Auth
+  /system/tenant/page:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Page tenants
+      tags:
+      - System Tenant
+  /system/tenant/simple-list:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: List enabled tenants
+      tags:
+      - System Tenant
+  /system/tenant/update:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Tenant
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_modules_system.TenantSaveRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update a tenant
+      tags:
+      - System Tenant
   /system/user/create:
     post:
       consumes:
@@ -2261,6 +5691,52 @@ paths:
       security:
       - BearerAuth: []
       summary: Page operations-console users
+      tags:
+      - System User
+  /system/user/profile/get:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Get current user's profile
+      tags:
+      - System User
+  /system/user/profile/update:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Update current user's profile
+      tags:
+      - System User
+  /system/user/profile/update-password:
+    put:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/github_com_lohasle_nimbus-framework-go_internal_platform_httpx.Response'
+      security:
+      - BearerAuth: []
+      summary: Change current user's password
       tags:
       - System User
   /system/user/simple-list:
