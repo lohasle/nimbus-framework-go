@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/lohasle/nimbus-framework-go/internal/modules/system"
 	"github.com/lohasle/nimbus-framework-go/internal/platform/config"
@@ -24,8 +25,30 @@ func Open(cfg config.Config) (*gorm.DB, error) {
 		&system.Role{},
 		&system.UserRole{},
 		&system.UserPost{},
+		&system.SystemMenu{},
+		&system.RoleMenu{},
+		&system.DictType{},
 		&system.DictData{},
 		&system.NotifyMessage{},
+		&system.Notice{},
+		&system.NotifyTemplate{},
+		&system.MailAccount{},
+		&system.MailTemplate{},
+		&system.MailLog{},
+		&system.SMSChannel{},
+		&system.SMSTemplate{},
+		&system.SMSLog{},
+		&system.AuthSMSCode{},
+		&system.SocialClient{},
+		&system.SocialUser{},
+		&system.SocialUserBind{},
+		&system.TenantPackage{},
+		&system.LoginLog{},
+		&system.OperateLog{},
+		&system.OAuth2Client{},
+		&system.OAuth2AccessToken{},
+		&system.OAuth2AuthorizationCode{},
+		&system.OAuth2Approve{},
 	); err != nil {
 		return nil, fmt.Errorf("migrate schema: %w", err)
 	}
@@ -38,8 +61,9 @@ func Open(cfg config.Config) (*gorm.DB, error) {
 
 func bootstrap(db *gorm.DB, cfg config.Config) error {
 	tenant := system.Tenant{
-		Name: cfg.BootstrapTenant, Status: 0, ContactName: "Nimbus 管理员",
+		Name: cfg.BootstrapTenant, Status: 0, ContactName: "Nimbus管理员",
 		ContactMobile: "13800000000", Domain: "localhost", AccountCount: 100,
+		ExpireTime: time.Now().AddDate(10, 0, 0),
 	}
 	if err := db.Where("name = ?", tenant.Name).FirstOrCreate(&tenant).Error; err != nil {
 		return fmt.Errorf("bootstrap tenant: %w", err)
@@ -51,12 +75,13 @@ func bootstrap(db *gorm.DB, cfg config.Config) error {
 	user := system.AdminUser{TenantID: tenant.ID, Username: cfg.BootstrapUser}
 	if err = db.Where("tenant_id = ? AND username = ?", tenant.ID, user.Username).Attrs(system.AdminUser{
 		PasswordHash: string(hash), Nickname: "平台管理员", Email: "admin@nimbus.local", DeptID: 1, Status: 0,
+		LoginDate: time.Now(),
 	}).FirstOrCreate(&user).Error; err != nil {
 		return fmt.Errorf("bootstrap admin: %w", err)
 	}
 	department := system.Department{ID: 1, TenantID: tenant.ID}
 	if err = db.Where("id = ? AND tenant_id = ?", department.ID, tenant.ID).Attrs(system.Department{
-		Name: "Nimbus 总部", ParentID: 0, Sort: 0, Status: 0, LeaderUserID: user.ID,
+		Name: "Nimbus Framework", ParentID: 0, Sort: 0, Status: 0, LeaderUserID: user.ID,
 	}).FirstOrCreate(&department).Error; err != nil {
 		return fmt.Errorf("bootstrap department: %w", err)
 	}
@@ -90,5 +115,5 @@ func bootstrap(db *gorm.DB, cfg config.Config) error {
 			return fmt.Errorf("bootstrap dictionary: %w", err)
 		}
 	}
-	return nil
+	return system.SeedBase(db)
 }

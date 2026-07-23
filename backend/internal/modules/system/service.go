@@ -1,6 +1,8 @@
 package system
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strconv"
@@ -15,6 +17,17 @@ import (
 type Service struct {
 	db  *gorm.DB
 	cfg config.Config
+}
+
+const (
+	tokenTypeAccess  = "access"
+	tokenTypeRefresh = "refresh"
+)
+
+type tokenClaims struct {
+	TenantID uint64 `json:"tenant_id"`
+	Type     string `json:"token_type"`
+	jwt.RegisteredClaims
 }
 
 func NewService(db *gorm.DB, cfg config.Config) *Service { return &Service{db: db, cfg: cfg} }
@@ -33,28 +46,13 @@ func (s *Service) Login(tenantID uint64, req LoginRequest) (TokenResponse, error
 	if bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(req.Password)) != nil {
 		return TokenResponse{}, errors.New("用户名或密码错误")
 	}
-	expires := time.Now().Add(s.cfg.TokenTTL)
-	claims := jwt.MapClaims{"sub": strconv.FormatUint(user.ID, 10), "tenant_id": user.TenantID, "exp": expires.Unix(), "iat": time.Now().Unix()}
-	token, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(s.cfg.JWTSecret))
-	if err != nil {
-		return TokenResponse{}, err
-	}
-	return TokenResponse{UserID: user.ID, UserType: 2, AccessToken: token, RefreshToken: token, ExpiresTime: expires.UnixMilli()}, nil
+	return s.issueTokenPair(user)
 }
 
 func (s *Service) ParseToken(raw string) (uint64, uint64, error) {
-	token, err := jwt.Parse(raw, func(token *jwt.Token) (any, error) {
-		if token.Method != jwt.SigningMethodHS256 {
-			return nil, errors.New("unexpected signing method")
-		}
-		return []byte(s.cfg.JWTSecret), nil
-	})
-	if err != nil || !token.Valid {
-		return 0, 0, errors.New("invalid token")
-	}
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok {
-		return 0, 0, errors.New("invalid claims")
+	claims, err := s.parseToken(raw, tokenTypeAccess)
+	if err != nil {
+		return 0, 0, err
 	}
 	userID, err := claims.GetSubject()
 	if err != nil {
@@ -64,11 +62,85 @@ func (s *Service) ParseToken(raw string) (uint64, uint64, error) {
 	if _, err = fmt.Sscan(userID, &uid); err != nil {
 		return 0, 0, err
 	}
-	tenant, ok := claims["tenant_id"].(float64)
-	if !ok {
-		return 0, 0, errors.New("invalid tenant claim")
+	return uid, claims.TenantID, nil
+}
+
+func (s *Service) RefreshToken(raw string) (TokenResponse, error) {
+	claims, err := s.parseToken(raw, tokenTypeRefresh)
+	if err != nil {
+		return TokenResponse{}, errors.New("无效的刷新令牌")
 	}
-	return uid, uint64(tenant), nil
+	userID, err := claims.GetSubject()
+	if err != nil {
+		return TokenResponse{}, errors.New("无效的刷新令牌")
+	}
+	uid, err := strconv.ParseUint(userID, 10, 64)
+	if err != nil {
+		return TokenResponse{}, errors.New("无效的刷新令牌")
+	}
+	var user AdminUser
+	if err := s.db.Where("id = ? AND tenant_id = ? AND status = 0", uid, claims.TenantID).First(&user).Error; err != nil {
+		return TokenResponse{}, errors.New("无效的刷新令牌")
+	}
+	return s.issueTokenPair(user)
+}
+
+func (s *Service) issueTokenPair(user AdminUser) (TokenResponse, error) {
+	now := time.Now()
+	accessExpires := now.Add(s.cfg.TokenTTL)
+	refreshExpires := now.Add(s.cfg.RefreshTokenTTL)
+	accessToken, err := s.signToken(user, tokenTypeAccess, now, accessExpires)
+	if err != nil {
+		return TokenResponse{}, err
+	}
+	refreshToken, err := s.signToken(user, tokenTypeRefresh, now, refreshExpires)
+	if err != nil {
+		return TokenResponse{}, err
+	}
+	return TokenResponse{
+		UserID: user.ID, UserType: 2, AccessToken: accessToken,
+		RefreshToken: refreshToken, ExpiresTime: accessExpires.UnixMilli(),
+	}, nil
+}
+
+func (s *Service) signToken(user AdminUser, tokenType string, issuedAt, expiresAt time.Time) (string, error) {
+	tokenID, err := newTokenID()
+	if err != nil {
+		return "", err
+	}
+	claims := tokenClaims{
+		TenantID: user.TenantID,
+		Type:     tokenType,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ID:        tokenID,
+			Subject:   strconv.FormatUint(user.ID, 10),
+			IssuedAt:  jwt.NewNumericDate(issuedAt),
+			ExpiresAt: jwt.NewNumericDate(expiresAt),
+		},
+	}
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(s.cfg.JWTSecret))
+}
+
+func newTokenID() (string, error) {
+	value := make([]byte, 16)
+	if _, err := rand.Read(value); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(value), nil
+}
+
+func (s *Service) parseToken(raw, expectedType string) (*tokenClaims, error) {
+	claims := &tokenClaims{}
+	token, err := jwt.ParseWithClaims(raw, claims, func(token *jwt.Token) (any, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, errors.New("unexpected signing method")
+		}
+		return []byte(s.cfg.JWTSecret), nil
+	}, jwt.WithValidMethods([]string{jwt.SigningMethodHS256.Alg()}))
+	if err != nil || !token.Valid || claims.Type != expectedType || claims.TenantID == 0 {
+		return nil, errors.New("invalid token")
+	}
+	return claims, nil
 }
 
 func (s *Service) User(id uint64) (AdminUser, error) {
@@ -79,51 +151,29 @@ func (s *Service) User(id uint64) (AdminUser, error) {
 
 func DefaultMenus() []Menu {
 	userComponent := "system/user/index"
+	userComponentName := "SystemUser"
 	infraConfigComponent := "infra/config/index"
+	infraConfigComponentName := "InfraConfig"
 	infraFileConfigComponent := "infra/fileConfig/index"
+	infraFileConfigComponentName := "InfraFileConfig"
 	infraAccessLogComponent := "infra/apiAccessLog/index"
-	memberUserComponent := "member/user/index"
-	memberLevelComponent := "member/level/index"
-	memberGroupComponent := "member/group/index"
-	memberTagComponent := "member/tag/index"
-	payAppComponent := "pay/app/index"
-	payOrderComponent := "pay/order/index"
-	payRefundComponent := "pay/refund/index"
+	infraAccessLogComponentName := "InfraApiAccessLog"
 	return []Menu{
 		{
 			ID: 1, Name: "系统管理", Path: "/system", Icon: "ep:tools",
 			Visible: true, KeepAlive: true, AlwaysShow: true,
 			Children: []Menu{{
 				ID: 100, ParentID: 1, Name: "用户管理", Path: "user",
-				Component: &userComponent, Icon: "ep:avatar", Visible: true, KeepAlive: true,
+				Component: &userComponent, ComponentName: &userComponentName, Icon: "ep:avatar", Visible: true, KeepAlive: true,
 			}},
 		},
 		{
 			ID: 2, Name: "基础设施", Path: "/infra", Icon: "ep:setting",
 			Visible: true, KeepAlive: true, AlwaysShow: true,
 			Children: []Menu{
-				{ID: 201, ParentID: 2, Name: "参数配置", Path: "config", Component: &infraConfigComponent, Icon: "ep:operation", Visible: true, KeepAlive: true},
-				{ID: 202, ParentID: 2, Name: "文件配置", Path: "file-config", Component: &infraFileConfigComponent, Icon: "ep:folder-opened", Visible: true, KeepAlive: true},
-				{ID: 203, ParentID: 2, Name: "访问日志", Path: "api-access-log", Component: &infraAccessLogComponent, Icon: "ep:document", Visible: true, KeepAlive: true},
-			},
-		},
-		{
-			ID: 3, Name: "会员中心", Path: "/member", Icon: "ep:user-filled",
-			Visible: true, KeepAlive: true, AlwaysShow: true,
-			Children: []Menu{
-				{ID: 301, ParentID: 3, Name: "会员管理", Path: "user", Component: &memberUserComponent, Icon: "ep:user", Visible: true, KeepAlive: true},
-				{ID: 302, ParentID: 3, Name: "会员等级", Path: "level", Component: &memberLevelComponent, Icon: "ep:medal", Visible: true, KeepAlive: true},
-				{ID: 303, ParentID: 3, Name: "会员分组", Path: "group", Component: &memberGroupComponent, Icon: "ep:collection-tag", Visible: true, KeepAlive: true},
-				{ID: 304, ParentID: 3, Name: "会员标签", Path: "tag", Component: &memberTagComponent, Icon: "ep:price-tag", Visible: true, KeepAlive: true},
-			},
-		},
-		{
-			ID: 4, Name: "支付中心", Path: "/pay", Icon: "ep:wallet-filled",
-			Visible: true, KeepAlive: true, AlwaysShow: true,
-			Children: []Menu{
-				{ID: 401, ParentID: 4, Name: "支付应用", Path: "app", Component: &payAppComponent, Icon: "ep:grid", Visible: true, KeepAlive: true},
-				{ID: 402, ParentID: 4, Name: "支付订单", Path: "order", Component: &payOrderComponent, Icon: "ep:tickets", Visible: true, KeepAlive: true},
-				{ID: 403, ParentID: 4, Name: "退款管理", Path: "refund", Component: &payRefundComponent, Icon: "ep:refresh-left", Visible: true, KeepAlive: true},
+				{ID: 201, ParentID: 2, Name: "参数配置", Path: "config", Component: &infraConfigComponent, ComponentName: &infraConfigComponentName, Icon: "ep:operation", Visible: true, KeepAlive: true},
+				{ID: 202, ParentID: 2, Name: "文件配置", Path: "file-config", Component: &infraFileConfigComponent, ComponentName: &infraFileConfigComponentName, Icon: "ep:folder-opened", Visible: true, KeepAlive: true},
+				{ID: 203, ParentID: 2, Name: "访问日志", Path: "api-access-log", Component: &infraAccessLogComponent, ComponentName: &infraAccessLogComponentName, Icon: "ep:document", Visible: true, KeepAlive: true},
 			},
 		},
 	}

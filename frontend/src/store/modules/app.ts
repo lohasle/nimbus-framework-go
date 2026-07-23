@@ -119,8 +119,7 @@ export const useAppStore = defineStore('app', {
       isDark: wsCache.get(CACHE_KEY.IS_DARK) === true, // Nimbus 默认使用浅色主题
       currentSize: wsCache.get('default') || 'default', // 组件尺寸
       theme:
-        wsCache.get(CACHE_KEY.THEME) ||
-        createNimbusTheme(wsCache.get(CACHE_KEY.IS_DARK) === true)
+        wsCache.get(CACHE_KEY.THEME) || createNimbusTheme(wsCache.get(CACHE_KEY.IS_DARK) === true)
     }
   },
   getters: {

@@ -1,8 +1,13 @@
 package main
 
 import (
+	"context"
 	"log/slog"
+	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	_ "github.com/lohasle/nimbus-framework-go/docs"
 	"github.com/lohasle/nimbus-framework-go/internal/modules/infra"
@@ -53,8 +58,28 @@ func main() {
 		os.Exit(1)
 	}
 	service := system.NewService(db, cfg)
-	if err = router.New(system.NewHandler(service), db).Run(cfg.HTTPAddr); err != nil {
-		slog.Error("server stopped", "error", err)
-		os.Exit(1)
+	engine := router.New(system.NewHandler(service), db)
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+	server := &http.Server{
+		Addr:              cfg.HTTPAddr,
+		Handler:           engine,
+		ReadHeaderTimeout: 5 * time.Second,
+	}
+	serverErrors := make(chan error, 1)
+	go func() { serverErrors <- server.ListenAndServe() }()
+	slog.Info("nimbus server started", "address", cfg.HTTPAddr)
+	select {
+	case <-ctx.Done():
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if err = server.Shutdown(shutdownCtx); err != nil {
+			slog.Error("nimbus server shutdown failed", "error", err)
+		}
+	case err = <-serverErrors:
+		if err != nil && err != http.ErrServerClosed {
+			slog.Error("nimbus server stopped", "error", err)
+			os.Exit(1)
+		}
 	}
 }

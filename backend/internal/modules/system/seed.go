@@ -1,0 +1,153 @@
+package system
+
+import (
+	"encoding/json"
+	"strings"
+
+	"gorm.io/gorm"
+)
+
+type menuSeed struct {
+	ID            uint64
+	ParentID      uint64
+	Name          string
+	Path          string
+	Icon          string
+	Component     string
+	ComponentName string
+	Sort          int
+	Permissions   []string
+}
+
+func SeedBase(db *gorm.DB) error {
+	groups := []SystemMenu{
+		{ID: 1, Name: "系统管理", Type: 1, Sort: 10, ParentID: 0, Path: "/system", Icon: "ep:tools", Status: 0, Visible: true, KeepAlive: true, AlwaysShow: true},
+		{ID: 2, Name: "基础设施", Type: 1, Sort: 20, ParentID: 0, Path: "/infra", Icon: "ep:setting", Status: 0, Visible: true, KeepAlive: true, AlwaysShow: true},
+		{ID: 3, Name: "会员中心", Type: 1, Sort: 30, ParentID: 0, Path: "/member", Icon: "ep:user-filled", Status: 0, Visible: true, KeepAlive: true, AlwaysShow: true},
+		{ID: 4, Name: "支付中心", Type: 1, Sort: 40, ParentID: 0, Path: "/pay", Icon: "ep:wallet-filled", Status: 0, Visible: true, KeepAlive: true, AlwaysShow: true},
+	}
+	pages := []menuSeed{
+		{100, 1, "用户管理", "user", "ep:avatar", "system/user/index", "SystemUser", 1, []string{"system:user:query", "system:user:create", "system:user:update", "system:user:delete", "system:user:update-password", "system:user:import", "system:user:export", "system:permission:assign-user-role"}},
+		{101, 1, "角色管理", "role", "ep:user", "system/role/index", "SystemRole", 2, []string{"system:role:query", "system:role:create", "system:role:update", "system:role:delete", "system:role:export", "system:permission:assign-role-menu", "system:permission:assign-role-data-scope"}},
+		{102, 1, "菜单管理", "menu", "ep:menu", "system/menu/index", "SystemMenu", 3, []string{"system:menu:query", "system:menu:create", "system:menu:update", "system:menu:delete"}},
+		{103, 1, "部门管理", "dept", "ep:office-building", "system/dept/index", "SystemDept", 4, []string{"system:dept:query", "system:dept:create", "system:dept:update", "system:dept:delete"}},
+		{104, 1, "岗位管理", "post", "ep:postcard", "system/post/index", "SystemPost", 5, []string{"system:post:query", "system:post:create", "system:post:update", "system:post:delete", "system:post:export"}},
+		{105, 1, "字典管理", "dict", "ep:collection", "system/dict/index", "SystemDictType", 6, []string{"system:dict:query", "system:dict:create", "system:dict:update", "system:dict:delete", "system:dict:export"}},
+		{106, 1, "租户管理", "tenant", "ep:office-building", "system/tenant/index", "SystemTenant", 7, []string{"system:tenant:query", "system:tenant:create", "system:tenant:update", "system:tenant:delete", "system:tenant:export"}},
+		{108, 1, "登录日志", "login-log", "ep:document", "system/loginlog/index", "SystemLoginLog", 9, []string{"system:login-log:query", "system:login-log:export"}},
+		{109, 1, "操作日志", "operate-log", "ep:document-checked", "system/operatelog/index", "SystemOperateLog", 10, []string{"system:operate-log:query", "system:operate-log:export"}},
+		{110, 1, "OAuth2 客户端", "oauth2-client", "ep:key", "system/oauth2/client/index", "SystemOAuth2Client", 11, []string{"system:oauth2-client:query", "system:oauth2-client:create", "system:oauth2-client:update", "system:oauth2-client:delete"}},
+		{111, 1, "OAuth2 令牌", "oauth2-token", "ep:connection", "system/oauth2/token/index", "SystemTokenClient", 12, []string{"system:oauth2-token:query", "system:oauth2-token:delete"}},
+		{112, 1, "通知公告", "notice", "ep:bell", "system/notice/index", "SystemNotice", 13, []string{"system:notice:query", "system:notice:create", "system:notice:update", "system:notice:delete"}},
+		{113, 1, "站内信模板", "notify-template", "ep:chat-line-square", "system/notify/template/index", "NotifySmsTemplate", 14, []string{"system:notify-template:query", "system:notify-template:create", "system:notify-template:update", "system:notify-template:delete", "system:notify-template:send-notify"}},
+		{114, 1, "站内信消息", "notify-message", "ep:message", "system/notify/message/index", "SystemNotifyMessage", 15, []string{"system:notify-message:query"}},
+		{115, 1, "邮箱账号", "mail-account", "ep:message-box", "system/mail/account/index", "SystemMailAccount", 16, []string{"system:mail-account:query", "system:mail-account:create", "system:mail-account:update", "system:mail-account:delete"}},
+		{116, 1, "邮件模板", "mail-template", "ep:document-copy", "system/mail/template/index", "SystemMailTemplate", 17, []string{"system:mail-template:query", "system:mail-template:create", "system:mail-template:update", "system:mail-template:delete", "system:mail-template:send-mail"}},
+		{117, 1, "邮件日志", "mail-log", "ep:document", "system/mail/log/index", "SystemMailLog", 18, []string{"system:mail-log:query", "system:mail-log:export"}},
+		{118, 1, "短信渠道", "sms-channel", "ep:iphone", "system/sms/channel/index", "SystemSmsChannel", 19, []string{"system:sms-channel:query", "system:sms-channel:create", "system:sms-channel:update", "system:sms-channel:delete"}},
+		{119, 1, "短信模板", "sms-template", "ep:chat-dot-square", "system/sms/template/index", "SystemSmsTemplate", 20, []string{"system:sms-template:query", "system:sms-template:create", "system:sms-template:update", "system:sms-template:delete", "system:sms-template:export", "system:sms-template:send-sms"}},
+		{120, 1, "短信日志", "sms-log", "ep:document", "system/sms/log/index", "SystemSmsLog", 21, []string{"system:sms-log:query", "system:sms-log:export"}},
+		{201, 2, "参数配置", "config", "ep:operation", "infra/config/index", "InfraConfig", 1, []string{"infra:config:query", "infra:config:create", "infra:config:update", "infra:config:delete", "infra:config:export"}},
+		{202, 2, "文件配置", "file-config", "ep:folder-opened", "infra/fileConfig/index", "InfraFileConfig", 2, []string{"infra:file-config:query", "infra:file-config:create", "infra:file-config:update", "infra:file-config:delete"}},
+		{203, 2, "访问日志", "api-access-log", "ep:document", "infra/apiAccessLog/index", "InfraApiAccessLog", 3, []string{"infra:api-access-log:query", "infra:api-access-log:export"}},
+		{204, 2, "文件管理", "file", "ep:folder", "infra/file/index", "InfraFile", 4, []string{"infra:file:query", "infra:file:create", "infra:file:delete"}},
+		{205, 2, "错误日志", "api-error-log", "ep:warning", "infra/apiErrorLog/index", "InfraApiErrorLog", 5, []string{"infra:api-error-log:query", "infra:api-error-log:update-status", "infra:api-error-log:export"}},
+		{206, 2, "数据源配置", "data-source-config", "ep:coin", "infra/dataSourceConfig/index", "InfraDataSourceConfig", 6, []string{"infra:data-source-config:query", "infra:data-source-config:create", "infra:data-source-config:update", "infra:data-source-config:delete"}},
+		{207, 2, "定时任务", "job", "ep:timer", "infra/job/index", "InfraJob", 7, []string{"infra:job:query", "infra:job:create", "infra:job:update", "infra:job:delete", "infra:job:trigger", "infra:job:export"}},
+		{208, 2, "任务日志", "job-log", "ep:document", "infra/job/logger/index", "InfraJobLog", 8, []string{"infra:job-log:query", "infra:job-log:export"}},
+		{209, 2, "Redis 监控", "redis", "ep:odometer", "infra/redis/index", "InfraRedis", 9, []string{"infra:redis:query"}},
+		{301, 3, "会员管理", "user", "ep:user", "member/user/index", "MemberUser", 1, []string{"member:user:query", "member:user:create", "member:user:update", "member:user:delete", "member:user:update-level", "member:user:update-point"}},
+		{302, 3, "会员等级", "level", "ep:medal", "member/level/index", "MemberLevel", 2, []string{"member:level:query", "member:level:create", "member:level:update", "member:level:delete"}},
+		{303, 3, "会员分组", "group", "ep:collection-tag", "member/group/index", "MemberGroup", 3, []string{"member:group:query", "member:group:create", "member:group:update", "member:group:delete"}},
+		{304, 3, "会员标签", "tag", "ep:price-tag", "member/tag/index", "MemberTag", 4, []string{"member:tag:query", "member:tag:create", "member:tag:update", "member:tag:delete"}},
+		{401, 4, "支付应用", "app", "ep:grid", "pay/app/index", "PayApp", 1, []string{"pay:app:query", "pay:app:create", "pay:app:update", "pay:app:delete", "pay:channel:query", "pay:channel:create", "pay:channel:update", "pay:channel:delete"}},
+		{402, 4, "支付订单", "order", "ep:tickets", "pay/order/index", "PayOrder", 2, []string{"pay:order:query", "pay:order:export"}},
+		{403, 4, "退款管理", "refund", "ep:refresh-left", "pay/refund/index", "PayRefund", 3, []string{"pay:refund:query", "pay:refund:create", "pay:refund:update", "pay:refund:delete", "pay:refund:export"}},
+	}
+	for _, group := range groups {
+		if err := upsertMenu(db, group); err != nil {
+			return err
+		}
+	}
+	// 清理当前底座未启用的菜单树及角色关联，重复启动保持幂等。
+	if err := deleteMenuTrees(db, []uint64{107, 121, 122, 210, 211}); err != nil {
+		return err
+	}
+	for _, page := range pages {
+		row := SystemMenu{ID: page.ID, Name: page.Name, Type: 2, Sort: page.Sort, ParentID: page.ParentID, Path: page.Path, Icon: page.Icon, Component: page.Component, ComponentName: page.ComponentName, Status: 0, Visible: true, KeepAlive: true}
+		if err := upsertMenu(db, row); err != nil {
+			return err
+		}
+		for index, permission := range page.Permissions {
+			button := SystemMenu{ID: page.ID*100 + uint64(index+1), Name: permissionName(permission), Permission: permission, Type: 3, Sort: index + 1, ParentID: page.ID, Status: 0, Visible: true}
+			if err := upsertMenu(db, button); err != nil {
+				return err
+			}
+		}
+	}
+	dictTypes := []DictType{
+		{Name: "通用状态", Type: "common_status", Status: 0},
+		{Name: "用户性别", Type: "system_user_sex", Status: 0},
+		{Name: "角色类型", Type: "system_role_type", Status: 0},
+		{Name: "菜单类型", Type: "system_menu_type", Status: 0},
+		{Name: "数据范围", Type: "system_data_scope", Status: 0},
+		{Name: "登录结果", Type: "system_login_result", Status: 0},
+	}
+	for _, item := range dictTypes {
+		if err := db.Where("type = ?", item.Type).FirstOrCreate(&item).Error; err != nil {
+			return err
+		}
+	}
+	var menuIDs []uint64
+	db.Model(&SystemMenu{}).Where("type IN ?", []int{1, 2}).Order("id").Pluck("id", &menuIDs)
+	pack := TenantPackage{Name: "默认套餐", Status: 0, Remark: "Nimbus 完整 System、Infra、RBAC 与 OAuth2 底座", MenuIDs: joinIDs(menuIDs)}
+	if err := db.Where("name = ?", pack.Name).Assign(pack).FirstOrCreate(&pack).Error; err != nil {
+		return err
+	}
+	return db.Model(&Tenant{}).Where("package_id = 0").Update("package_id", pack.ID).Error
+}
+
+func deleteMenuTrees(db *gorm.DB, roots []uint64) error {
+	all := append([]uint64(nil), roots...)
+	frontier := append([]uint64(nil), roots...)
+	seen := make(map[uint64]struct{}, len(roots))
+	for _, id := range roots {
+		seen[id] = struct{}{}
+	}
+	for len(frontier) > 0 {
+		var children []uint64
+		if err := db.Model(&SystemMenu{}).Where("parent_id IN ?", frontier).Pluck("id", &children).Error; err != nil {
+			return err
+		}
+		frontier = frontier[:0]
+		for _, id := range children {
+			if _, exists := seen[id]; exists {
+				continue
+			}
+			seen[id] = struct{}{}
+			all = append(all, id)
+			frontier = append(frontier, id)
+		}
+	}
+	if err := db.Where("menu_id IN ?", all).Delete(&RoleMenu{}).Error; err != nil {
+		return err
+	}
+	return db.Where("id IN ?", all).Delete(&SystemMenu{}).Error
+}
+
+func upsertMenu(db *gorm.DB, row SystemMenu) error {
+	return db.Where("id = ?", row.ID).Assign(row).FirstOrCreate(&row).Error
+}
+
+func permissionName(permission string) string {
+	parts := strings.Split(permission, ":")
+	if len(parts) == 0 {
+		return permission
+	}
+	return strings.ToUpper(parts[len(parts)-1])
+}
+
+func joinIDs(ids []uint64) string {
+	data, _ := json.Marshal(ids)
+	return string(data)
+}

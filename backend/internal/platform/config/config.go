@@ -10,6 +10,7 @@ type Config struct {
 	DBDSN           string
 	JWTSecret       string
 	TokenTTL        time.Duration
+	RefreshTokenTTL time.Duration
 	BootstrapTenant string
 	BootstrapUser   string
 	BootstrapPass   string
@@ -21,6 +22,7 @@ func Load() Config {
 		DBDSN:           env("NIMBUS_DB_DSN", "nimbus:nimbus_dev@tcp(127.0.0.1:23316)/nimbus_platform_go?charset=utf8mb4&parseTime=True&loc=Local"),
 		JWTSecret:       env("NIMBUS_JWT_SECRET", "nimbus-local-development-secret"),
 		TokenTTL:        duration("NIMBUS_TOKEN_TTL", 2*time.Hour),
+		RefreshTokenTTL: duration("NIMBUS_REFRESH_TOKEN_TTL", 30*24*time.Hour),
 		BootstrapTenant: env("NIMBUS_BOOTSTRAP_TENANT", "Nimbus Framework"),
 		BootstrapUser:   env("NIMBUS_BOOTSTRAP_USERNAME", "admin"),
 		BootstrapPass:   env("NIMBUS_BOOTSTRAP_PASSWORD", "admin123"),
