@@ -7,7 +7,8 @@
 3. [架构说明](architecture.md)
 4. [开发规范](development-standards.md)
 5. [测试策略](testing-strategy.md)
-6. [SPEC 索引](specs/README.md)
+6. [测试报告](test-report.md)
+7. [SPEC 索引](specs/README.md)
 
 ## 目录约定
 

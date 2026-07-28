@@ -35,6 +35,6 @@ cd ..
 
 前端地址为 `http://localhost:3000`。视觉基线与 Java 两版一致；只有后端语言和部署形态不同。
 
-工程文档从 [docs/README.md](docs/README.md) 开始；Agent 与自动化工具从 [AGENTS.md](AGENTS.md) 开始。
+详细说明见 [开发指南](docs/development-standards.md)、[架构说明](docs/architecture.md) 与 [测试报告](docs/test-report.md)。文档总入口为 [docs/README.md](docs/README.md)，Agent 与自动化工具入口为 [AGENTS.md](AGENTS.md)。
 
 停止本地前后端执行 `./scripts/stop-all.sh`；运行接口冒烟测试执行 `./scripts/test-functional.sh`。

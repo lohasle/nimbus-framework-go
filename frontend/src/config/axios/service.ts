@@ -1,6 +1,6 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse, InternalAxiosRequestConfig } from 'axios'
 
-import { ElMessage, ElMessageBox, ElNotification } from 'element-plus'
+import { ElMessage, ElNotification } from 'element-plus'
 import qs from 'qs'
 import { config } from '@/config/axios/config'
 import {
@@ -13,27 +13,35 @@ import {
 } from '@/utils/auth'
 import errorCode from './errorCode'
 
-import { resetRouter } from '@/router'
+import router, { resetRouter } from '@/router'
 import { deleteUserCache } from '@/hooks/web/useCache'
 import { ApiEncrypt } from '@/utils/encrypt'
 
 const tenantEnable = import.meta.env.VITE_APP_TENANT_ENABLE
 const { result_code, base_url, request_timeout } = config
 
-// 需要忽略的提示。忽略后，自动 Promise.reject('error')
-const ignoreMsgs = [
-  '无效的刷新令牌', // 刷新令牌被删除时，不用提示
-  '刷新令牌已过期' // 使用刷新令牌，刷新获取新的访问令牌时，结果因为过期失败，此时需要忽略。否则，会导致继续 401，无法跳转到登出界面
+interface AuthRequestConfig extends InternalAxiosRequestConfig {
+  __authRetry?: boolean
+  __skipAuthRefresh?: boolean
+}
+
+// 同一页面内所有 401 共享一次刷新；失败退登也只能执行一次。
+let refreshPromise: Promise<string> | null = null
+let sessionExpiryStarted = false
+// 请求白名单：这些公开接口的 401 属于业务校验失败，不能触发会话过期流程。
+const whiteList: string[] = [
+  '/system/auth/login',
+  '/system/auth/register',
+  '/system/auth/refresh-token',
+  '/system/auth/send-sms-code',
+  '/system/auth/sms-login',
+  '/system/auth/social-login',
+  '/system/auth/social-auth-redirect',
+  '/system/auth/reset-password',
+  '/system/tenant/get-id-by-name',
+  '/system/tenant/get-by-website',
+  'system/captcha/'
 ]
-// 是否显示重新登录
-export const isRelogin = { show: false }
-// Axios 无感知刷新令牌，参考 https://www.dashingdog.cn/article/11 与 https://segmentfault.com/a/1190000020210980 实现
-// 请求队列
-let requestList: any[] = []
-// 是否正在刷新中
-let isRefreshToken = false
-// 请求白名单，无须 token 的接口
-const whiteList: string[] = ['/login', '/refresh-token']
 
 // 创建axios实例
 const service: AxiosInstance = axios.create({
@@ -54,6 +62,7 @@ service.interceptors.request.use(
     if (isToken && whiteList.some((v) => config.url?.includes(v))) {
       isToken = false
     }
+    ;(config as AuthRequestConfig).__skipAuthRefresh = !isToken
     if (getAccessToken() && isToken) {
       config.headers.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义 token
     }
@@ -109,7 +118,7 @@ service.interceptors.request.use(
 service.interceptors.response.use(
   async (response: AxiosResponse<any>) => {
     let { data } = response
-    const config = response.config
+    const config = response.config as AuthRequestConfig
     if (!data) {
       // 返回“[HTTP]请求没有返回值”;
       throw new Error()
@@ -146,52 +155,12 @@ service.interceptors.response.use(
     const code = data.code ?? result_code
     // 获取错误信息
     const msg = data.msg || errorCode[code] || errorCode['default']
-    if (ignoreMsgs.indexOf(msg) !== -1) {
-      // 如果是忽略的错误码，直接返回 msg 异常
-      return Promise.reject(msg)
-    } else if (code === 401) {
-      // 如果未认证，并且未进行刷新令牌，说明可能是访问令牌过期了
-      if (!isRefreshToken) {
-        isRefreshToken = true
-        // 1. 如果获取不到刷新令牌，则只能执行登出操作
-        if (!getRefreshToken()) {
-          return handleAuthorized()
-        }
-        // 2. 进行刷新访问令牌
-        try {
-          const refreshTokenRes = await refreshToken()
-          // 2.1 刷新成功，则回放队列的请求 + 当前请求
-          setToken((await refreshTokenRes).data.data)
-          config.headers!.Authorization = 'Bearer ' + getAccessToken()
-          requestList.forEach((cb: any) => {
-            cb()
-          })
-          requestList = []
-          if ((config!.headers || {}).isEncrypt) {
-            ;(config!.headers || {}).isEncrypted = true
-          }
-          return service(config)
-        } catch (e) {
-          // 为什么需要 catch 异常呢？刷新失败时，请求因为 Promise.reject 触发异常。
-          // 2.2 刷新失败，只回放队列的请求
-          requestList.forEach((cb: any) => {
-            cb()
-          })
-          // 提示是否要登出。即不回放当前请求！不然会形成递归
-          return handleAuthorized()
-        } finally {
-          requestList = []
-          isRefreshToken = false
-        }
-      } else {
-        // 添加到队列，等待刷新获取到新的令牌
-        return new Promise((resolve) => {
-          requestList.push(() => {
-            config.headers!.Authorization = 'Bearer ' + getAccessToken() // 让每个请求携带自定义token 请根据实际情况自行修改
-            resolve(service(config))
-          })
-        })
+    if (code === 401) {
+      if (config.__skipAuthRefresh) {
+        ElNotification.error({ title: msg })
+        return Promise.reject(new Error(msg))
       }
+      return handleUnauthorized(config)
     } else if (code === 500) {
       ElMessage.error(t('sys.api.errMsg500'))
       return Promise.reject(new Error(msg))
@@ -210,21 +179,19 @@ service.interceptors.response.use(
       })
       return Promise.reject(new Error(msg))
     } else if (code !== 0 && code !== 200) {
-      if (msg === '无效的刷新令牌') {
-        // hard coding：忽略这个提示，直接登出
-        console.log(msg)
-        return handleAuthorized()
-      } else {
-        ElNotification.error({ title: msg })
-      }
+      ElNotification.error({ title: msg })
       return Promise.reject('error')
     } else {
       return data
     }
   },
-  (error: AxiosError) => {
+  async (error: AxiosError) => {
+    const requestConfig = error.config as AuthRequestConfig | undefined
+    if (error.response?.status === 401 && requestConfig && !requestConfig.__skipAuthRefresh) {
+      return handleUnauthorized(requestConfig)
+    }
     console.log('err' + error) // for debug
-    let { message } = error
+    let message = (error.response?.data as any)?.msg || error.message
     const { t } = useI18n()
     if (message === 'Network Error') {
       message = t('sys.api.errorMessage')
@@ -239,33 +206,88 @@ service.interceptors.response.use(
 )
 
 const refreshToken = async () => {
-  axios.defaults.headers.common['tenant-id'] = getTenantId()
-  return await axios.post(base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken())
+  return await axios.post(
+    base_url + '/system/auth/refresh-token?refreshToken=' + getRefreshToken(),
+    undefined,
+    { headers: { 'tenant-id': getTenantId() } }
+  )
 }
-const handleAuthorized = () => {
-  const { t } = useI18n()
-  if (!isRelogin.show) {
-    // 如果已经到登录页面则不进行弹窗提示
-    if (window.location.href.includes('login')) {
-      return
+
+const refreshAccessTokenWithLock = async (expiredAccessToken?: string): Promise<string> => {
+  const executeRefresh = async (): Promise<string> => {
+    const latestAccessToken = getAccessToken()
+    if (expiredAccessToken && latestAccessToken && latestAccessToken !== expiredAccessToken) {
+      return latestAccessToken
     }
-    isRelogin.show = true
-    ElMessageBox.confirm(t('sys.api.timeoutMessage'), t('common.confirmTitle'), {
-      showCancelButton: false,
-      closeOnClickModal: false,
-      showClose: false,
-      closeOnPressEscape: false,
-      confirmButtonText: t('login.relogin'),
-      type: 'warning'
-    }).then(() => {
-      resetRouter() // 重置静态路由表
-      deleteUserCache() // 删除用户缓存
-      removeToken()
-      isRelogin.show = false
-      // 干掉token后再走一次路由让它过router.beforeEach的校验
-      window.location.href = window.location.href
+
+    if (!getRefreshToken()) {
+      throw new Error('刷新令牌不存在')
+    }
+    const refreshTokenRes = await refreshToken()
+    setToken(refreshTokenRes.data.data)
+    const refreshedAccessToken = getAccessToken()
+    if (!refreshedAccessToken) {
+      throw new Error('刷新访问令牌失败')
+    }
+    return refreshedAccessToken
+  }
+
+  if (typeof navigator !== 'undefined' && navigator.locks) {
+    const tenantId = getTenantId() || 'default'
+    return navigator.locks.request(`nimbus-auth-token-refresh-${tenantId}`, executeRefresh)
+  }
+  return executeRefresh()
+}
+
+const getRefreshedAccessToken = (expiredAccessToken?: string): Promise<string> => {
+  if (!refreshPromise) {
+    refreshPromise = refreshAccessTokenWithLock(expiredAccessToken).finally(() => {
+      refreshPromise = null
     })
   }
-  return Promise.reject(t('sys.api.timeoutMessage'))
+  return refreshPromise
+}
+
+const handleUnauthorized = async (config: AuthRequestConfig) => {
+  if (config.__authRetry) {
+    return expireSession()
+  }
+  config.__authRetry = true
+  const expiredAccessToken = config.headers.Authorization?.toString().replace(/^Bearer\s+/, '')
+  try {
+    const refreshedAccessToken = await getRefreshedAccessToken(expiredAccessToken)
+    config.headers.Authorization = 'Bearer ' + refreshedAccessToken
+    if (config.headers.isEncrypt) {
+      config.headers.isEncrypted = true
+    }
+    return service(config)
+  } catch {
+    return expireSession()
+  }
+}
+
+const expireSession = (): Promise<never> => {
+  const { t } = useI18n()
+  if (!sessionExpiryStarted) {
+    sessionExpiryStarted = true
+    removeToken()
+    deleteUserCache()
+    resetRouter()
+    ElMessage.closeAll()
+    ElNotification.closeAll()
+
+    if (router.currentRoute.value.path !== '/login') {
+      const browserFullPath =
+        window.location.pathname + window.location.search + window.location.hash
+      const redirect =
+        router.currentRoute.value.fullPath === '/' && browserFullPath !== '/'
+          ? browserFullPath
+          : router.currentRoute.value.fullPath
+      ElMessage.warning(t('sys.api.timeoutMessage'))
+      const loginLocation = router.resolve({ path: '/login', query: { redirect } })
+      window.location.replace(loginLocation.href)
+    }
+  }
+  return Promise.reject(new Error('SESSION_EXPIRED'))
 }
 export { service }

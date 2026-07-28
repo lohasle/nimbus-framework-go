@@ -1,6 +1,5 @@
 import router from './router'
 import type { RouteRecordRaw } from 'vue-router'
-import { isRelogin } from '@/config/axios/service'
 import { getAccessToken } from '@/utils/auth'
 import { useTitle } from '@/hooks/web/useTitle'
 import { useNProgress } from '@/hooks/web/useNProgress'
@@ -41,9 +40,7 @@ router.beforeEach(async (to, from, next) => {
         dictStore.setDictMap().then()
       }
       if (!userStore.getIsSetUser) {
-        isRelogin.show = true
         await userStore.setUserInfoAction()
-        isRelogin.show = false
         // 后端过滤菜单
         await permissionStore.generateRoutes()
         permissionStore.getAddRouters.forEach((route) => {
