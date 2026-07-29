@@ -1,3 +1,8 @@
+> [!IMPORTANT]
+> **Moved to [aiutil/nimbus-framework-go](https://github.com/aiutil/nimbus-framework-go). This repository is archived and no longer updated.**
+>
+> **本项目已迁移至 [aiutil/nimbus-framework-go](https://github.com/aiutil/nimbus-framework-go)。本仓库已归档，不再更新。**
+
 # Nimbus Framework Go
 
 Nimbus Framework 的 Go 1.26 模块化单体版。它以 Java Nimbus 底座为功能源进行迁移，保留统一的新 UI 与兼容的前端接口契约，默认使用 MySQL 8.4。
